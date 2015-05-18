@@ -1,0 +1,146 @@
+#ifndef OPINION_FORMATION_H
+#define OPINION_FORMATION_H
+
+#include "Simulator.h"
+#include <ctime>
+#include <time.h>
+
+
+class Opinion_formation: public Simulator
+{
+    protected:
+        vector<Node*> state0;
+        vector<Node*> state1;
+
+
+    public:
+        typedef enum {           //Whatever is equal to zero is the default state
+	  S=0, I=1, beta=1
+        } stateType;
+        float T;                 // transmissibiltiy, e.g. P{infection spreading along a given edge that connects an infected and a susceptible}
+
+        Opinion_formation():Simulator() {};
+        Opinion_formation(Network* net):Simulator(net) {};
+        ~Opinion_formation() { };
+
+        void set_transmissibility(double t) { this->T = t; }
+
+        double expected_R0 () {
+            //assert(T != NULL);
+            return T / calc_critical_transmissibility();
+        }
+
+        vector<Node*> rand_infect (int n) {
+            assert(n > 0);
+            vector<Node*> initial_infected = rand_set_nodes_to_state(n, I);
+            for (int i = 0; i < n; i++) {
+                state1.push_back(initial_infected[i]);
+            }
+            return initial_infected; 
+        }
+
+
+        void step_simulation () {
+	  // assert(state1.size() > 0);
+            time++;
+            //cerr << "\t" << infected.size() << endl;
+
+	  
+	    vector<Node*> nodes = net->get_nodes();
+	    for (unsigned int i = 0; i < nodes.size(); i++) { //agents first simultaneously inspect their neighbourhoods, and then select their products.
+	      nodes[i]->update_utility_function();
+	     } 
+	    for (unsigned int i = 0; i < nodes.size(); i++) {  
+	      Node* inode = nodes[i];
+	      double delta_utility = inode->get_utility();
+	      double p1 =  exp(beta*delta_utility)/(exp(beta*delta_utility)+exp(-beta*delta_utility));	      //  p0=1-p1;
+	      // cerr << "p1: " << p1 << "\n\n";
+	      if (mtrand->rand() < p1) inode->set_state(1);   
+	      else inode->set_state(0);
+	    }
+	    
+        }
+
+
+        void run_simulation( int max_time = 30) {             //stop 'max_time' toegevoegd  voor geval dat geen evenwicht bereikt wordt
+	  	mtrand->seed(42);
+	  while (time <max_time) {
+	     step_simulation();
+	     // outfile <<  time << "\t" << net->get_coarse_state()  << std::endl; 
+	   //  cerr <<"random number test output " << time << " :  " << mtrand->rand() << " \n\n";
+	  }	 
+        }
+
+        int count_infected() {
+            return state1.size();
+        }
+
+        int epidemic_size() {
+            return state0.size();
+        }
+
+        void reset() {
+            reset_time();
+
+            set_these_nodes_to_state(state1, S);
+            state1.clear();
+
+            set_these_nodes_to_state(state0, S);
+            state0.clear();
+        }
+
+        void summary() {
+            cerr << "Network size: " << net->size();
+	    cerr << "\tCoarse state " << net->get_coarse_state() << "\n\n";
+    
+
+        }
+};
+
+
+
+
+class Ensemble
+{
+ protected:  time_t starttime;
+    
+ public:
+  
+ 
+                                        
+    void SimulationTime(FILE* f)  //  Write out the duration of the whole simulation
+    {
+      int64_t seconds = (int64_t) difftime(time(NULL),starttime);
+      int64_t days = seconds / 86400; seconds -= days * 86400;
+      int64_t hours = seconds / 3600; seconds -= hours * 3600;
+      int64_t minutes = seconds / 60; seconds -= minutes * 60;
+      fprintf(f,"Simulation time: %d days %d hours %d minutes %d seconds\n",(int)days,(int)hours,(int)minutes,(int)seconds);
+    }
+
+// open a file in write mode.
+ ofstream outfile;
+ outfile.open("densities.dat");
+    
+
+ void EnsembleAverage(Network  net)
+ {
+   // open a file in write mode.
+   ofstream outfile;
+   outfile.open("densities.dat");
+   
+   starttime = time(NULL); // now
+   for (int i = 0; i < 5; i++){
+        // Choose and run simulation
+        Opinion_formation sim(&net);
+        sim.run_simulation();
+        outfile << "my text here!" << std::endl;
+        //cout << sim.epidemic_size() << endl;
+        sim.summary();
+        sim.reset();
+    }
+    
+    outfile.close();
+    
+};
+
+#endif

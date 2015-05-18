@@ -1,0 +1,80 @@
+\hypertarget{classGillespie__Network__SEIRS__Sim}{}\section{Gillespie\+\_\+\+Network\+\_\+\+S\+E\+I\+R\+S\+\_\+\+Sim Class Reference}
+\label{classGillespie__Network__SEIRS__Sim}\index{Gillespie\+\_\+\+Network\+\_\+\+S\+E\+I\+R\+S\+\_\+\+Sim@{Gillespie\+\_\+\+Network\+\_\+\+S\+E\+I\+R\+S\+\_\+\+Sim}}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_abe4374e74f8a8693b420b1cd2eaeadfe}{}enum {\bfseries state\+Type} \{ \\*
+{\bfseries S\+U\+S\+C\+E\+P\+T\+I\+B\+L\+E}, 
+{\bfseries E\+X\+P\+O\+S\+E\+D}, 
+{\bfseries I\+N\+F\+E\+C\+T\+I\+O\+U\+S}, 
+{\bfseries R\+E\+S\+I\+S\+T\+A\+N\+T}, 
+\\*
+{\bfseries S\+T\+A\+T\+E\+\_\+\+S\+I\+Z\+E}
+ \}\label{classGillespie__Network__SEIRS__Sim_abe4374e74f8a8693b420b1cd2eaeadfe}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_af3ce0634c2db7ec0e52df194862d3c54}{}{\bfseries Gillespie\+\_\+\+Network\+\_\+\+S\+E\+I\+R\+S\+\_\+\+Sim} (\hyperlink{classNetwork}{Network} $\ast$net, double m, double b, double g, double im\+\_\+dur)\label{classGillespie__Network__SEIRS__Sim_af3ce0634c2db7ec0e52df194862d3c54}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_ad40e3f247461baff81b5d4a09c50d1b5}{}void {\bfseries run\+\_\+simulation} (double duration)\label{classGillespie__Network__SEIRS__Sim_ad40e3f247461baff81b5d4a09c50d1b5}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a222828bfc04960db72c3e0c70d092c23}{}int {\bfseries current\+\_\+epidemic\+\_\+size} ()\label{classGillespie__Network__SEIRS__Sim_a222828bfc04960db72c3e0c70d092c23}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a61a0e4c7bdd2f4bbea0c8d243b451b0b}{}int {\bfseries reset} ()\label{classGillespie__Network__SEIRS__Sim_a61a0e4c7bdd2f4bbea0c8d243b451b0b}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a96af62a8a574e29b4f5984bbfbaa2887}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries rand\+\_\+choose\+\_\+nodes} (int n)\label{classGillespie__Network__SEIRS__Sim_a96af62a8a574e29b4f5984bbfbaa2887}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a6aa0b3cd23a36e76c591d7395e428a92}{}void {\bfseries rand\+\_\+infect} (int n)\label{classGillespie__Network__SEIRS__Sim_a6aa0b3cd23a36e76c591d7395e428a92}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_abae7c7a901f40ab3047a805fe7f91e4a}{}void {\bfseries infect} (\hyperlink{classNode}{Node} $\ast$node)\label{classGillespie__Network__SEIRS__Sim_abae7c7a901f40ab3047a805fe7f91e4a}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a3e1987e0ca831efafbc4cd7b470675f7}{}int {\bfseries next\+\_\+event} ()\label{classGillespie__Network__SEIRS__Sim_a3e1987e0ca831efafbc4cd7b470675f7}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a0b75c947ffb7646dfd43d7d2ee4dbad9}{}void {\bfseries add\+\_\+event} (double time, char type, \hyperlink{classNode}{Node} $\ast$node)\label{classGillespie__Network__SEIRS__Sim_a0b75c947ffb7646dfd43d7d2ee4dbad9}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a3193fb9bf6b3dd896d72bdfcf04e4d42}{}\hyperlink{classNetwork}{Network} $\ast$ {\bfseries network}\label{classGillespie__Network__SEIRS__Sim_a3193fb9bf6b3dd896d72bdfcf04e4d42}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a04a4ebce166d5fe4db9b0682c4be6dcd}{}double {\bfseries mu}\label{classGillespie__Network__SEIRS__Sim_a04a4ebce166d5fe4db9b0682c4be6dcd}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a44df052180f79b45b03bc2e62235223e}{}double {\bfseries beta}\label{classGillespie__Network__SEIRS__Sim_a44df052180f79b45b03bc2e62235223e}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_ae82ddeca49ef108857160ada93e2ec0a}{}double {\bfseries gamma}\label{classGillespie__Network__SEIRS__Sim_ae82ddeca49ef108857160ada93e2ec0a}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a24c4c1e7175470953a16b31094cbf732}{}double {\bfseries immunity\+\_\+duration}\label{classGillespie__Network__SEIRS__Sim_a24c4c1e7175470953a16b31094cbf732}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a15c255bee7c7ca340cf87df69f2566c4}{}priority\+\_\+queue$<$ \hyperlink{classEvent}{Event}, vector$<$ \hyperlink{classEvent}{Event} $>$, \hyperlink{classcompTime}{comp\+Time} $>$ {\bfseries Event\+Q}\label{classGillespie__Network__SEIRS__Sim_a15c255bee7c7ca340cf87df69f2566c4}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a8517dadca41d398109c7750fd9235570}{}vector$<$ int $>$ {\bfseries state\+\_\+counts}\label{classGillespie__Network__SEIRS__Sim_a8517dadca41d398109c7750fd9235570}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a919dd648216a95ded448aa21afda9b39}{}double {\bfseries Now}\label{classGillespie__Network__SEIRS__Sim_a919dd648216a95ded448aa21afda9b39}
+
+\item 
+\hypertarget{classGillespie__Network__SEIRS__Sim_a62f25b5c1c5a66b983f62c37f4bd0753}{}\hyperlink{classMTRand}{M\+T\+Rand} {\bfseries mtrand}\label{classGillespie__Network__SEIRS__Sim_a62f25b5c1c5a66b983f62c37f4bd0753}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Gillespie\+\_\+\+Network\+\_\+\+S\+E\+I\+R\+S\+\_\+\+Sim.\+h\end{DoxyCompactItemize}
