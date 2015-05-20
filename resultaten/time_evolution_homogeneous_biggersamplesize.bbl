@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+
+\bibitem{avitabile14}
+Daniele Avitabile, Rebecca Hoyle, and Giovanni Samaey.
+\newblock Noise reduction in coarse bifurcation analysis of stochastic
+  agent-based models: an example of consumer lock-in.
+\newblock {\em SIAM Journal on Applied Dynamical Systems}, 13(4):1583--1619,
+  2014.
+
+\bibitem{watts98}
+Duncan~J Watts and Steven~H Strogatz.
+\newblock
+  \href{http://www.nature.com/nature/journal/v393/n6684/pdf/393440a0.pdf}
+  {Collective dynamics of 'small-world' networks}.
+\newblock {\em Nature}, 393:440--442, 1998.
+
+\end{thebibliography}

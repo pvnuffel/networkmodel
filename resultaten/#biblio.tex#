@@ -1,3 +1,6 @@
+
+
+
 @article{avitabile14,
   author = "Avitabile, Daniele and Hoyle, Rebecca and Samaey, Giovanni",
   title = "Noise reduction in coarse bifurcation analysis of stochastic agent-based models: an example of consumer lock-in",
@@ -9,11 +12,3 @@
   url = "https://lirias.kuleuven.be/handle/123456789/492023",
 }
 
-@article{watts98,
-  author="Watts, Duncan J and Strogatz, Steven H",
-  title= {\href{http://www.nature.com/nature/journal/v393/n6684/pdf/393440a0.pdf} {Collective dynamics of 'small-world' networks}},
-  journal="Nature",
-  volume="393",
-  pages="440--442",
-  year="1998"
-}

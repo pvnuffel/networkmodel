@@ -83,12 +83,12 @@ int main(int argc, char* argv[])  {
       cout << "Enter mean preference in [-1,1]"; cin >> mean_preference;          
       cout << "Enter preference variance in [0,1]"; cin >> var_preference;         
       cout << "Enter mean interaction strength in [0,1]"; cin >> mean_coupling;         
-      cout << "Enter interaction strength variance in [0,1]"; cin >> var_coupling;           
+      cout << "Enter interaction strength variance in [0,1]"; cin >> var_coupling;   //L10        
       cout << "Enter output-file name (without .dat)"; cin >> output_name;      
       cout << "Enter seed if you want repeatable data"; cin >> rg_seed;
       if (network_type.compare("small_world")==0)
 	{ 
-	  cout << "Enter rewiring probability for creating small-world network with the Watts-Strogatz algorithm"; cin >> p_rewiring;
+	  cout << "Enter rewiring probability for creating small-world network with the Watts-Strogatz algorithm"; cin >> p_rewiring;  //L13
 	}
       cout << endl;
       //other options (add later): network type, directed?, output_filename, etc.
@@ -168,11 +168,6 @@ int main(int argc, char* argv[])  {
        else if(network_type.compare("ring_lattice")==0)
 	 {
 	   net->ring_lattice(network_size, lambda);
-	 }
-       else if(network_type.compare("poisson")==0)
-	 {
-	   net->populate(network_size);
-	   net->rand_connect_poisson(lambda);
 	 }
        else { cerr << "No valid network type!" << endl;}
 

@@ -215,7 +215,7 @@ bool Network::small_world(int N, int K, double beta) {
             Node* node = nodes[i];
             int degree = node->deg();
             // How many of node's edges will be shuffled?
-            int m = rand_binomial( degree, beta, &mtrand );
+            int m = rand_binomial( degree, beta, &mtrand );  //m=degree for beta=1
             // Which edges will be shuffled?
             vector<int> edge_indeces(m);
             rand_nchoosek( degree, edge_indeces, &mtrand );
@@ -254,6 +254,7 @@ bool Network::small_world(int N, int K, double beta) {
 }
 
 // generates a poisson network vi the Erdos & Renyi algorithm
+
 bool Network::erdos_renyi(double lambda) {
     int n = size();
     if (lambda > n-1) { cerr << "mean degree can't be bigger than network size - 1 "  << endl;return false;} // mean degree can't be bigger than network size - 1 
