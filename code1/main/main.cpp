@@ -77,7 +77,7 @@ int main(int argc, char* argv[])  {
       cout << "Enter the number of time steps "; cin >> time_steps;     
       cout << "Enter number of Monte Carlo steps: "; cin >> M;
       cout << "Enter number of nodes: "; cin >> network_size;      
-      cout << "Enter netwerk type: 'fully_connected', 'random', 'small_world', 'square_lattice' or 'ring_lattice'"; cin >> network_type;
+      cout << "Enter netwerk type: 'fully_connected', 'random', 'small_world', 'square_lattice' or 'ring'"; cin >> network_type;
       cout << "Enter average number of edges: "; cin >> lambda;                 
       cout << "Enter initial average state (in [0,1] "; cin >> average_state;          
       cout << "Enter mean preference in [-1,1]"; cin >> mean_preference;          
@@ -145,6 +145,10 @@ int main(int argc, char* argv[])  {
 	   //	   net->erdos_renyi(lambda);      
 	   net->populate(network_size);
 	   net->fast_random_graph(lambda); //uses erdos-renyi-algorithm except for sparse networks (edges/nodes < 1 %).
+	   net->get_deg_series();
+	   //for (int x = 0; x != example.size(); ++x)
+	   //     cout << example[x] << "- subscripting" << endl;
+	   cout << "mean deg = " << net->mean_deg();
 	 }
        else if (network_type.compare("fully_connected")==0)
 	 {
@@ -154,6 +158,10 @@ int main(int argc, char* argv[])  {
        else if (network_type.compare("small_world")==0)
 	 {
 	   net->small_world(network_size, lambda, p_rewiring);      //p_rewiring=  , p_rewiring=1 -> erdos random network, p_rewiring=0 -> lattice-model
+	   net->get_deg_series();
+	   //for (int x = 0; x != example.size(); ++x)
+	   //     cout << example[x] << "- subscripting" << endl;
+	   cout << "mean deg = " << net->mean_deg();
 	 }
        else if(network_type.compare("square_lattice")==0)
 	 {
@@ -165,9 +173,10 @@ int main(int argc, char* argv[])  {
 	   //	   net->square_lattice(number_of_rows, number_of_rows, 1); //no diagonal interactions chosen: lambda =4
 	   net->square_lattice(number_of_rows, number_of_columns, 1);
 	 }
-       else if(network_type.compare("ring_lattice")==0)
+       else if(network_type.compare("ring")==0)
 	 {
 	   net->ring_lattice(network_size, lambda);
+	   cout << "mean deg = " << net->mean_deg();
 	 }
        else if(network_type.compare("poisson")==0)
 	 {

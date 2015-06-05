@@ -153,6 +153,10 @@ bool Network::is_weighted() {
 
 
 bool Network::ring_lattice(int N, int K) {
+  if (K%2 !=0) { 
+    K++;
+    cout << "Using " << K << " nodes (beacause meand degree should be even for constructing ring lattice or small world networks) \n"<<endl;    
+    }
     if (K > (N - 1) / 2) {
         cerr << "Cannot construct a ring lattice with K-nearest neighbors where K > (network size - 1) / 2\n";
         return false;
@@ -160,7 +164,7 @@ bool Network::ring_lattice(int N, int K) {
     clear_nodes();
     populate(N);
     for (unsigned int i = 0; i < node_list.size(); i++) {
-        for (int j = 1; j <= K; j++) {
+        for (int j = 1; j <= K/2; j++) {
             int dest = (i+j) % node_list.size();
             node_list[i]->connect_to(node_list[dest]);
         }
