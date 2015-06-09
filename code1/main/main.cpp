@@ -65,8 +65,17 @@ int main(int argc, char* argv[])  {
   int network_size, M, time_steps, lambda, rg_seed;
   double mean_preference, var_preference, mean_coupling, var_coupling, average_state, p_rewiring;
   string output_name, network_type;
-  FILE *file_s0, *file_s1, *file_m;
+  FILE *file_s0, *file_s1, *file_m, *file_mean, *file_var, *file;
   time_t starttime; 
+  bool separate_coarse_states = false;
+
+  // cout << "armadillotest"  << endl;
+  // // vec y = zeros<vec>(5);  
+  // //mat A = randu<mat>(10,10);
+  // vec z;
+  // z << 2 << 4 << 9 <<1; 
+  // vec q = square(z);
+  // cout << q[0] << endl;
 
   //MTRand* mtrand;
   // cout<<  "argc: "<< argc <<"\n" ;
@@ -133,7 +142,10 @@ int main(int argc, char* argv[])  {
      int state_1_counter =0;
      int state_0_counter =0;
      int mixed_counter =0;
-          
+     vec  averages= zeros<vec>(time_steps+1); 
+     vec averages2 = zeros<vec>(time_steps+1); 
+     vec variances  = zeros<vec>(time_steps+1); 
+
      starttime = time(NULL); //now */
      init();
                                                         
@@ -157,7 +169,7 @@ int main(int argc, char* argv[])  {
 	 }
        else if (network_type.compare("small_world")==0)
 	 {
-	   net->small_world(network_size, lambda, p_rewiring);      //p_rewiring=  , p_rewiring=1 -> erdos random network, p_rewiring=0 -> lattice-model
+	   net->small_world(network_size, lambda, p_rewiring);      // p_rewiring=1 -> erdos random network, p_rewiring=0 -> lattice-model
 	   net->get_deg_series();
 	   //for (int x = 0; x != example.size(); ++x)
 	   //     cout << example[x] << "- subscripting" << endl;
@@ -185,60 +197,101 @@ int main(int argc, char* argv[])  {
 	 }
        else { cerr << "No valid network type!" << endl;}
 
-     for(int j= 0; j < M; j++)
+
+    
+       for(int j= 0; j < M; j++)
        {       
 	 net->initialize(mean_coupling,var_coupling, mean_preference, var_preference,average_state); 
 	 Opinion_formation sim(net); 
 	 sim.run_simulation(time_steps);
        //vector<double> coarse_states = sim.get_coarse_states();
-       vec coarse_states = conv_to< vec >::from(sim.get_coarse_states());  // Conversion from std::vector to Armadillo vector
-       if ( coarse_states[time_steps] > 0.7 )  { lockin_states_1 += coarse_states; state_1_counter++;   }       //0.7 is nog willekeurig gekozen, kies grenswaarde later ifv aantal nodes bijv.?
-       else if (coarse_states[time_steps] < 0.3 ) { lockin_states_0 += coarse_states; state_0_counter++; }
-       else { mixed_states += coarse_states; mixed_counter++;} 
-       }
-     cout << "mixed states = " << mixed_counter << endl;
-     cout << "lockin_states product 1 = " << state_1_counter << endl;
-     cout << "lockin_states product 0 = " << state_0_counter << endl;
 
-     if (state_0_counter>0) 
-       {
-	 char temp[4096];
-	 sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_state0", ".dat");
-	 file_s0 = fopen(temp, "w");
-	 if (file_s0 == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
-	 for (int t=0; t < time_steps+1; t++) {
-	   fprintf(file_s0, "%d %f \n", t, lockin_states_0[t]/(state_0_counter)  );
-	 }
-	  }
-     if (state_1_counter>0) 
-       { 
-	 char temp[4096];
-	 sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_state1", ".dat");
-	 file_s1 = fopen(temp, "w");
-	 if (file_s1 == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
-	 for (int t=0; t < time_steps+1; t++) {
-	   fprintf(file_s1, "%d %f  \n", t, lockin_states_1[t]/(state_1_counter)  );
-	 }
+	     vec coarse_states = conv_to< vec >::from(sim.get_coarse_states());  // Conversion from std::vector to Armadillo vector
+
+	     if (separate_coarse_states) //set this boolean true if you want to look at time evolution (without realizations cancelling each other out)
+	       {
+		 if ( coarse_states[time_steps] > 0.7 )  { lockin_states_1 += coarse_states; state_1_counter++;   }       //0.7 is nog willekeurig gekozen, kies grenswaarde later ifv aantal nodes bijv.?
+		 else if (coarse_states[time_steps] < 0.3 ) { lockin_states_0 += coarse_states; state_0_counter++; }
+		 else { mixed_states += coarse_states; mixed_counter++;}
+	       }
+	     else // no separation of coarse states
+	       {
+		 averages += coarse_states;
+		 averages2 += square(coarse_states);
+	       } 	     
+
        }
-     if (mixed_counter>0) 
-       { 
-	 char temp[4096];
-	 sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_mixed", ".dat");
-	 file_m = fopen(temp, "w");
-	 if (file_m == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
-	 for (int t=0; t < time_steps+1; t++) {
-	   fprintf(file_m, "%d %f  \n", t, mixed_states[t]/(mixed_counter)  );
-	 }
-       }
-     
+       averages /= M;
+       averages2 /=M;
+       variances= averages2 - square(averages);
+
+       char temp[4096];
+       sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_o", ".dat");
+       file= fopen(temp, "w");
+       if (file == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+       for (int t=0; t < time_steps+1; t++) {
+       	 fprintf(file, "%d %f %f \n", t, averages[t], sqrt(variances[t])  );
+            }
  
-	int64_t seconds = (int64_t) difftime(time(NULL),starttime);
-	int64_t days = seconds / 86400; seconds -= days * 86400;
-	int64_t hours = seconds / 3600; seconds -= hours * 3600;
-	int64_t minutes = seconds / 60; seconds -= minutes * 60;
-	fprintf(stdout,"Simulation time: %d days %d hours %d minutes %d seconds\n",(int)days,(int)hours,(int)minutes,(int)seconds);
-	fprintf(stdout,"CPU currently used by current process: %f % \n ", getCurrentValue());
-	
+       // char temp[4096];
+       // sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_mean", ".dat");
+       // file_mean = fopen(temp, "w");
+       // if (file_mean == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+       // for (int t=0; t < time_steps+1; t++) {
+       // 	 fprintf(file_mean, "%d %f \n", t, averages[t]  );
+       //      }
+      // char temp2[4096];
+      //  sprintf(temp2, "%s%s%s%s", "data/", output_name.c_str(),"_variance", ".dat");
+      //  file_var = fopen(temp2, "w");
+      //  if (file_var == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+      //  for (int t=0; t < time_steps+1; t++) {
+      // 	 fprintf(file_var, "%d %f \n", t, variances[t]  );
+      //  }
+     
+		 // cout << "mixed states = " << mixed_counter << endl;
+		 // cout << "lockin_states product 1 = " << state_1_counter << endl;
+		 // cout << "lockin_states product 0 = " << state_0_counter << endl;
+		 if (state_0_counter>0) 
+		   {
+		     char temp[4096];
+		     sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_state0", ".dat");
+		     file_s0 = fopen(temp, "w");
+		     if (file_s0 == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+		     for (int t=0; t < time_steps+1; t++) {
+		       fprintf(file_s0, "%d %f \n", t, lockin_states_0[t]/(state_0_counter)  );
+		     }
+		   }
+		 if (state_1_counter>0) 
+		   { 
+		     char temp[4096];
+		     sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_state1", ".dat");
+		     file_s1 = fopen(temp, "w");
+		     if (file_s1 == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+		     for (int t=0; t < time_steps+1; t++) {
+		       fprintf(file_s1, "%d %f  \n", t, lockin_states_1[t]/(state_1_counter)  );
+		     }
+		   }
+		 if (mixed_counter>0) 
+		   { 
+		     char temp[4096];
+		     sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_mixed", ".dat");
+		     file_m = fopen(temp, "w");
+		     if (file_m == 0) { cerr << "Error: can't open file \n" << output_name << endl; }
+		     for (int t=0; t < time_steps+1; t++) {
+		       fprintf(file_m, "%d %f  \n", t, mixed_states[t]/(mixed_counter)  );
+		     }
+		   }
+	                    
+	 
+	     
+     int64_t seconds = (int64_t) difftime(time(NULL),starttime);
+     int64_t days = seconds / 86400; seconds -= days * 86400;
+     int64_t hours = seconds / 3600; seconds -= hours * 3600;
+     int64_t minutes = seconds / 60; seconds -= minutes * 60;
+     cout << "Simulation " << output_name  << " done " <<  endl;
+     fprintf(stdout,"Simulation time: %d days %d hours %d minutes %d seconds\n",(int)days,(int)hours,(int)minutes,(int)seconds);
+     fprintf(stdout,"CPU currently used by current process: %f % \n ", getCurrentValue());
+ 
 	return 0;
    }
  catch (const std::bad_alloc& ex)

@@ -25,7 +25,7 @@ for x in range(1,len(sys.argv)):
     pl.plot(data[:,0], data[:,1],marker='o',markersize=3,label= datafile)
 
 xmin =0
-xmax = 30
+xmax = 100
 ymin = 0
 ymax = 1
 pl.axis([xmin, xmax, ymin, ymax])
