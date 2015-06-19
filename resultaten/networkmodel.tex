@@ -3,6 +3,8 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc} 
+\usepackage{subcaption}
+\usepackage{caption}
 \usepackage{hyperref} 
 %opening
 \title{}
@@ -68,16 +70,46 @@ Above described experiments are repeated with the same simulation parameters and
 
 \section{Variance of asymptotic equilibria}
 
-The expectation value $\mathbb{E}(\rho_N)$ and the variance $\texttt{var}(\rho_N(t))$ are monitored as a function of time for a collection of different means of the initial states. In Figure \ref{fig:variance_mean} the several orbits on the $(\mathbb{E}(\rho_N),\texttt{var}(\rho_N(t)))$-plane are shown for high values of the interaction strength.  
+The expectation value $\mathbb{E}(\rho_N)$ and the variance $\texttt{var}(\rho_N(t))$ are monitored as a function of time for a collection of different means of the initial states. In Figure \ref{fig:variance_mean_high} the several orbits on the $(\mathbb{E}(\rho_N),\texttt{var}(\rho_N(t)))$-plane are shown for low, intermediate and high values of the average interaction strength.  
 
+
+\pagestyle{empty}
 
 \begin{figure}
-\includegraphics[width=0.9\textwidth]{sigma_variance_N1000_M500_fully_connected_20timesteps.pdf}
-\caption{Expectation and variance of average states, starting from different initial conditions. For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
+\centering
+\begin{subfigure}[b]{0.7\textwidth}
+\includegraphics[width=\textwidth]{variance_mean_N1000_M500_fully_connected_20timesteps.pdf}
+\caption{High coupling strength:  $\bar{\nu}=0.5$, $\bar{\zeta}=0.236$.}
+\label{fig:fig:variance_mean_high}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.7\textwidth}
+\includegraphics[width=\textwidth]{variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf}
+\caption{ Intermediate coupling strength: $\bar{\nu}=0.263$, $\bar{\zeta}=0.0879$.}
+\label{fig:fig:variance_mean_inter}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.7\textwidth}
+\includegraphics[width=\textwidth]{variance_mean_N1000_M500_mixed_fully_20timesteps.pdf}
+\caption{ Low coupling strength: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$.}
+\label{fig:fig:variance_mean_mixed}
+\end{subfigure}
+\caption{Expectation and variance of average states, starting from different initial states $u_0$. For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
 \label{fig:fig:variance_mean}
 \end{figure}
 
 
+\begin{figure}
+\includegraphics[width=0.9\textwidth]{variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf}
+\caption{ Expectation and variance of average states for low average coupling: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$). For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
+\label{fig:fig:variance_mean_inter}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.9\textwidth]{variance_mean_N1000_M500_mixed_fully_20timesteps.pdf}
+\caption{ Expectation and variance of average states for low average coupling: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$). For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
+\label{fig:fig:variance_mean_mixed}
+\end{figure}
 
 \newpage{}
 
