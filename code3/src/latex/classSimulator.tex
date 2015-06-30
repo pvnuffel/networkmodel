@@ -1,0 +1,82 @@
+\hypertarget{classSimulator}{}\section{Simulator Class Reference}
+\label{classSimulator}\index{Simulator@{Simulator}}
+Inheritance diagram for Simulator\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSimulator}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSimulator_afac88757024c1074b6b0c3c39c441010}{}{\bfseries Simulator} (\hyperlink{classNetwork}{Network} $\ast$net, string fname)\label{classSimulator_afac88757024c1074b6b0c3c39c441010}
+
+\item 
+\hypertarget{classSimulator_a476a63ef9b628c54d0129ffe270465ed}{}{\bfseries Simulator} (vector$<$ \hyperlink{classNetwork}{Network} $\ast$ $>$ net\+\_\+list, string fname)\label{classSimulator_a476a63ef9b628c54d0129ffe270465ed}
+
+\item 
+\hypertarget{classSimulator_a340d96c82d8ff7786949a620dee2ee53}{}void {\bfseries set\+\_\+network} (\hyperlink{classNetwork}{Network} $\ast$net)\label{classSimulator_a340d96c82d8ff7786949a620dee2ee53}
+
+\item 
+\hypertarget{classSimulator_a0255e53faefcf2acd6b594551f7e3a92}{}\hyperlink{classNetwork}{Network} $\ast$ {\bfseries network} ()\label{classSimulator_a0255e53faefcf2acd6b594551f7e3a92}
+
+\item 
+\hypertarget{classSimulator_a775d86392b65bf43adadba7a8c6286fd}{}int {\bfseries get\+\_\+time} ()\label{classSimulator_a775d86392b65bf43adadba7a8c6286fd}
+
+\item 
+\hypertarget{classSimulator_a97fa0d0068e759f345ff06cc5436fc3a}{}void {\bfseries reset\+\_\+time} ()\label{classSimulator_a97fa0d0068e759f345ff06cc5436fc3a}
+
+\item 
+\hypertarget{classSimulator_a20c0e44c291569c4ea17cc93f7b069bf}{}void {\bfseries set\+\_\+all\+\_\+nodes\+\_\+to\+\_\+state} (state\+Type s)\label{classSimulator_a20c0e44c291569c4ea17cc93f7b069bf}
+
+\item 
+\hypertarget{classSimulator_a9b6c9f8c97a6142c39b95bb3d77cf18c}{}void {\bfseries set\+\_\+these\+\_\+nodes\+\_\+to\+\_\+state} (vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ nodes, state\+Type s)\label{classSimulator_a9b6c9f8c97a6142c39b95bb3d77cf18c}
+
+\item 
+\hypertarget{classSimulator_a61a761f7efaf7b63b7a8dff3ae50f00f}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries rand\+\_\+choose\+\_\+nodes} (int n)\label{classSimulator_a61a761f7efaf7b63b7a8dff3ae50f00f}
+
+\item 
+\hypertarget{classSimulator_a1b4bad3cfa952e283ac1576c2b9357a8}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries rand\+\_\+set\+\_\+nodes\+\_\+to\+\_\+state} (int n, state\+Type state)\label{classSimulator_a1b4bad3cfa952e283ac1576c2b9357a8}
+
+\item 
+\hypertarget{classSimulator_a3bee1aeade42b904c9a561e0e4c84460}{}virtual void {\bfseries time\+\_\+step} ()\label{classSimulator_a3bee1aeade42b904c9a561e0e4c84460}
+
+\item 
+\hypertarget{classSimulator_accb74d40c16c3a6a7f658e5d272bdf0c}{}virtual void {\bfseries run\+\_\+simulation} ()\label{classSimulator_accb74d40c16c3a6a7f658e5d272bdf0c}
+
+\item 
+\hypertarget{classSimulator_a51fba2398daa6f380fa4034856735491}{}virtual int {\bfseries count\+\_\+infected} ()\label{classSimulator_a51fba2398daa6f380fa4034856735491}
+
+\item 
+\hypertarget{classSimulator_a23ddae46561995fccb3d5a769efa1294}{}virtual void {\bfseries reset} ()\label{classSimulator_a23ddae46561995fccb3d5a769efa1294}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSimulator_aa81e60ca4246da452d64dddb70beb33f}{}int {\bfseries time}\label{classSimulator_aa81e60ca4246da452d64dddb70beb33f}
+
+\item 
+\hypertarget{classSimulator_a1570947a7c2c40c45f24a0d599463328}{}\hyperlink{classNetwork}{Network} $\ast$ {\bfseries net}\label{classSimulator_a1570947a7c2c40c45f24a0d599463328}
+
+\item 
+\hypertarget{classSimulator_a0f168636a3de4d3336a23606f3111173}{}\hyperlink{classMTRand}{M\+T\+Rand} $\ast$ {\bfseries mtrand}\label{classSimulator_a0f168636a3de4d3336a23606f3111173}
+
+\item 
+\hypertarget{classSimulator_a7fd4ec3cb930229a61fc31f9ba4a4ab2}{}vector$<$ \hyperlink{classNetwork}{Network} $\ast$ $>$ {\bfseries net\+\_\+list}\label{classSimulator_a7fd4ec3cb930229a61fc31f9ba4a4ab2}
+
+\item 
+\hypertarget{classSimulator_a413c5a4e5af6ada7fe66b7689678f087}{}string {\bfseries fname}\label{classSimulator_a413c5a4e5af6ada7fe66b7689678f087}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSimulator_a1a287cb00e5388a7866b5e4f5a35a137}{}time\+\_\+t {\bfseries starttime}\label{classSimulator_a1a287cb00e5388a7866b5e4f5a35a137}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Simulator.\+h\end{DoxyCompactItemize}

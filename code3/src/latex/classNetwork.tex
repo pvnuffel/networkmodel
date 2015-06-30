@@ -1,0 +1,240 @@
+\hypertarget{classNetwork}{}\section{Network Class Reference}
+\label{classNetwork}\index{Network@{Network}}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classNetwork_a7e628548107e46864ae0c856bf5aaa9f}{}enum {\bfseries net\+Type} \{ {\bfseries Undirected} =0, 
+{\bfseries Directed} =1
+ \}\label{classNetwork_a7e628548107e46864ae0c856bf5aaa9f}
+
+\item 
+\hypertarget{classNetwork_a1743227a9ab62bdffe7eaf5e6826ca74}{}enum {\bfseries output\+Type} \{ {\bfseries Node\+Names} =0, 
+{\bfseries Node\+I\+Ds} =1
+ \}\label{classNetwork_a1743227a9ab62bdffe7eaf5e6826ca74}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classNetwork_ae75eec96cb0933276170cd5b1a5d715e}{}{\bfseries Network} (string name, net\+Type directed)\label{classNetwork_ae75eec96cb0933276170cd5b1a5d715e}
+
+\item 
+\hypertarget{classNetwork_a8f7bc88d89cf3f52600b792bb9985010}{}{\bfseries Network} (const \hyperlink{classNetwork}{Network} \&net)\label{classNetwork_a8f7bc88d89cf3f52600b792bb9985010}
+
+\item 
+\hypertarget{classNetwork_a00a122e905f834927294533dd1e99788}{}\hyperlink{classNetwork}{Network} $\ast$ {\bfseries duplicate} ()\label{classNetwork_a00a122e905f834927294533dd1e99788}
+
+\item 
+\hypertarget{classNetwork_adb84b687ca9b3898ac7de910654dc6ed}{}bool {\bfseries operator==} (const \hyperlink{classNetwork}{Network} \&n2)\label{classNetwork_adb84b687ca9b3898ac7de910654dc6ed}
+
+\item 
+\hypertarget{classNetwork_af24aaed953f573bb2b19a1db78734fb0}{}int {\bfseries get\+\_\+id} ()\label{classNetwork_af24aaed953f573bb2b19a1db78734fb0}
+
+\item 
+\hypertarget{classNetwork_a37e0e9e2db034f6b549a9a0198cd9d75}{}string {\bfseries get\+\_\+name} ()\label{classNetwork_a37e0e9e2db034f6b549a9a0198cd9d75}
+
+\item 
+\hypertarget{classNetwork_a0da93244ee6aa2c51af37aa193481330}{}int {\bfseries size} ()\label{classNetwork_a0da93244ee6aa2c51af37aa193481330}
+
+\item 
+\hypertarget{classNetwork_afbf84b31a0cc3fa9d41411fae0afcb46}{}bool {\bfseries has\+\_\+unit\+\_\+edges} ()\label{classNetwork_afbf84b31a0cc3fa9d41411fae0afcb46}
+
+\item 
+\hypertarget{classNetwork_a5bc3e3d4a34b0a5d888c291c8946db75}{}bool {\bfseries is\+\_\+directed} ()\label{classNetwork_a5bc3e3d4a34b0a5d888c291c8946db75}
+
+\item 
+\hypertarget{classNetwork_a15b38693e92c7f62e3d6c7c8c1227499}{}\hyperlink{classMTRand}{M\+T\+Rand} $\ast$ {\bfseries get\+\_\+rng} ()\label{classNetwork_a15b38693e92c7f62e3d6c7c8c1227499}
+
+\item 
+\hypertarget{classNetwork_ace9c30eb87c661132f910fb1345afc48}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries get\+\_\+nodes} ()\label{classNetwork_ace9c30eb87c661132f910fb1345afc48}
+
+\item 
+\hypertarget{classNetwork_a709ce39807cad7c87f13692d26c87274}{}\hyperlink{classNode}{Node} $\ast$ {\bfseries get\+\_\+node} (int node\+\_\+id)\label{classNetwork_a709ce39807cad7c87f13692d26c87274}
+
+\item 
+\hypertarget{classNetwork_aeabfba6ab4874667882749594de7dada}{}\hyperlink{classNode}{Node} $\ast$ {\bfseries get\+\_\+node\+\_\+by\+\_\+name} (string node\+\_\+name)\label{classNetwork_aeabfba6ab4874667882749594de7dada}
+
+\item 
+\hypertarget{classNetwork_ad9312ef8bc67d27066cfbebc8794e313}{}\hyperlink{classNode}{Node} $\ast$ {\bfseries get\+\_\+rand\+\_\+node} ()\label{classNetwork_ad9312ef8bc67d27066cfbebc8794e313}
+
+\item 
+\hypertarget{classNetwork_a7c009bf7dde31ee211045212f47b0710}{}vector$<$ \hyperlink{classEdge}{Edge} $\ast$ $>$ {\bfseries get\+\_\+edges} ()\label{classNetwork_a7c009bf7dde31ee211045212f47b0710}
+
+\item 
+\hypertarget{classNetwork_afd8a3ade922ecd10c333b5d3bb3621de}{}\hyperlink{classEdge}{Edge} $\ast$ {\bfseries get\+\_\+edge} (int id)\label{classNetwork_afd8a3ade922ecd10c333b5d3bb3621de}
+
+\item 
+\hypertarget{classNetwork_a99010c3efb17d60477fd48b2b667d783}{}vector$<$ state\+Type $>$ {\bfseries get\+\_\+node\+\_\+states} ()\label{classNetwork_a99010c3efb17d60477fd48b2b667d783}
+
+\item 
+\hypertarget{classNetwork_a4a3afc7f166ccaf84560740ca9a4caaa}{}void {\bfseries get\+\_\+bad\+\_\+edges} (vector$<$ \hyperlink{classEdge}{Edge} $\ast$ $>$ \&self\+\_\+loops, vector$<$ \hyperlink{classEdge}{Edge} $\ast$ $>$ \&multiedges)\label{classNetwork_a4a3afc7f166ccaf84560740ca9a4caaa}
+
+\item 
+\hypertarget{classNetwork_a2787d023f770195e241442cd5934ac6c}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries get\+\_\+component} (\hyperlink{classNode}{Node} $\ast$node)\label{classNetwork_a2787d023f770195e241442cd5934ac6c}
+
+\item 
+\hypertarget{classNetwork_aaa803fd081ed5f24a38c981055fd459d}{}vector$<$ vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ $>$ {\bfseries get\+\_\+components} ()\label{classNetwork_aaa803fd081ed5f24a38c981055fd459d}
+
+\item 
+\hypertarget{classNetwork_aad3d529c979cefd275f1c72c51aedff8}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries get\+\_\+biggest\+\_\+component} ()\label{classNetwork_aad3d529c979cefd275f1c72c51aedff8}
+
+\item 
+\hypertarget{classNetwork_aac7db1edc83f6ee1811545504d391944}{}bool {\bfseries topology\+\_\+altered} ()\label{classNetwork_aac7db1edc83f6ee1811545504d391944}
+
+\item 
+\hypertarget{classNetwork_a18f85b48490f70707eb0d3ecf3af3bb7}{}\hyperlink{classNode}{Node} $\ast$ {\bfseries add\+\_\+new\+\_\+node} ()\label{classNetwork_a18f85b48490f70707eb0d3ecf3af3bb7}
+
+\item 
+\hypertarget{classNetwork_a43c10781b1a8cd9d1d45631524619e12}{}void {\bfseries populate} (int n)\label{classNetwork_a43c10781b1a8cd9d1d45631524619e12}
+
+\item 
+\hypertarget{classNetwork_aaf0e1975514749d95d7e3baeb931c176}{}void {\bfseries add\+\_\+node} (\hyperlink{classNode}{Node} $\ast$node)\label{classNetwork_aaf0e1975514749d95d7e3baeb931c176}
+
+\item 
+\hypertarget{classNetwork_afa5ba9cc04dd16835794edc3a9069f73}{}void {\bfseries delete\+\_\+node} (\hyperlink{classNode}{Node} $\ast$node)\label{classNetwork_afa5ba9cc04dd16835794edc3a9069f73}
+
+\item 
+\hypertarget{classNetwork_a3b1aed2ba4355e1b6429afc43105632e}{}bool {\bfseries all\+\_\+to\+\_\+all\+\_\+coupling} ()\label{classNetwork_a3b1aed2ba4355e1b6429afc43105632e}
+
+\item 
+\hypertarget{classNetwork_a1bc00a48e15b686922ea929d2d9cfef9}{}bool {\bfseries erdos\+\_\+renyi} (double lambda)\label{classNetwork_a1bc00a48e15b686922ea929d2d9cfef9}
+
+\item 
+\hypertarget{classNetwork_aeb3c4bdf9689a323e124c05f7829798f}{}bool {\bfseries sparse\+\_\+random\+\_\+graph} (double lambda)\label{classNetwork_aeb3c4bdf9689a323e124c05f7829798f}
+
+\item 
+\hypertarget{classNetwork_ad43dcfdc9ae6eceba263345fcf89a8d2}{}bool {\bfseries fast\+\_\+random\+\_\+graph} (double lambda)\label{classNetwork_ad43dcfdc9ae6eceba263345fcf89a8d2}
+
+\item 
+\hypertarget{classNetwork_a669fa9b5563bfffafc0fa8e9a48eb867}{}bool {\bfseries ring\+\_\+lattice} (int N, int K)\label{classNetwork_a669fa9b5563bfffafc0fa8e9a48eb867}
+
+\item 
+\hypertarget{classNetwork_a04933d68710bb79fec7bd8e10ec19f9d}{}bool {\bfseries square\+\_\+lattice} (int R, int C, bool diag)\label{classNetwork_a04933d68710bb79fec7bd8e10ec19f9d}
+
+\item 
+\hypertarget{classNetwork_a29c5d2dd1efbc9f40c3a0e318e49036c}{}bool {\bfseries small\+\_\+world} (int N, int K, double beta)\label{classNetwork_a29c5d2dd1efbc9f40c3a0e318e49036c}
+
+\item 
+\hypertarget{classNetwork_abd6b9fe591b882fc716738fb612d89fa}{}bool {\bfseries rand\+\_\+connect\+\_\+poisson} (double lambda)\label{classNetwork_abd6b9fe591b882fc716738fb612d89fa}
+
+\item 
+\hypertarget{classNetwork_a414dde2a6bcd5f9cb45e5cab6452c852}{}bool {\bfseries rand\+\_\+connect\+\_\+powerlaw} (double alpha, double kappa)\label{classNetwork_a414dde2a6bcd5f9cb45e5cab6452c852}
+
+\item 
+\hypertarget{classNetwork_a068af8f9da7939151dbeedbef35af9d0}{}bool {\bfseries rand\+\_\+connect\+\_\+exponential} (double lambda)\label{classNetwork_a068af8f9da7939151dbeedbef35af9d0}
+
+\item 
+\hypertarget{classNetwork_af0dc0df3f919b35d6c5586c8cbc71634}{}bool {\bfseries rand\+\_\+connect\+\_\+user} (vector$<$ double $>$ dist)\label{classNetwork_af0dc0df3f919b35d6c5586c8cbc71634}
+
+\item 
+\hypertarget{classNetwork_a0ecaab9f51f811cdc1071b66d3e358b6}{}bool {\bfseries rand\+\_\+connect\+\_\+explicit} (vector$<$ int $>$ deg\+\_\+series)\label{classNetwork_a0ecaab9f51f811cdc1071b66d3e358b6}
+
+\item 
+\hypertarget{classNetwork_a3769c229ac52fb7c7aff373747a002b8}{}bool {\bfseries rand\+\_\+connect\+\_\+stubs} (vector$<$ \hyperlink{classEdge}{Edge} $\ast$ $>$ stubs)\label{classNetwork_a3769c229ac52fb7c7aff373747a002b8}
+
+\item 
+\hypertarget{classNetwork_abde72ca35cf99ff927385c8f7843490f}{}bool {\bfseries lose\+\_\+loops} ()\label{classNetwork_abde72ca35cf99ff927385c8f7843490f}
+
+\item 
+\hypertarget{classNetwork_af8886395b3c292a670c7ffed1610448e}{}void {\bfseries clear\+\_\+nodes} ()\label{classNetwork_af8886395b3c292a670c7ffed1610448e}
+
+\item 
+\hypertarget{classNetwork_a80e6909a2fcf656ae8f720920b7a721d}{}void {\bfseries clear\+\_\+edges} ()\label{classNetwork_a80e6909a2fcf656ae8f720920b7a721d}
+
+\item 
+\hypertarget{classNetwork_a1d655233d6f1e7e976eb72c28d7ffe02}{}void {\bfseries disconnect\+\_\+edges} ()\label{classNetwork_a1d655233d6f1e7e976eb72c28d7ffe02}
+
+\item 
+\hypertarget{classNetwork_aeae904a08d9d5e7f8b8735a06f0d96f9}{}bool {\bfseries shuffle\+\_\+edges} (double frac)\label{classNetwork_aeae904a08d9d5e7f8b8735a06f0d96f9}
+
+\item 
+\hypertarget{classNetwork_af00312d958665700967525224eaf3171}{}void {\bfseries set\+\_\+node\+\_\+states} (vector$<$ state\+Type $>$ \&states)\label{classNetwork_af00312d958665700967525224eaf3171}
+
+\item 
+\hypertarget{classNetwork_adabe89c6c5d79192e5149aab1c79686d}{}void {\bfseries initialize} (double mean\+\_\+coupling, double var\+\_\+coupling, double mean\+\_\+preference, double var\+\_\+preference, double mean\+\_\+initial\+\_\+state)\label{classNetwork_adabe89c6c5d79192e5149aab1c79686d}
+
+\item 
+\hypertarget{classNetwork_a5be5e3f143bc528d37c49e0406b7b039}{}void {\bfseries set\+\_\+topology\+\_\+altered} (bool flag)\label{classNetwork_a5be5e3f143bc528d37c49e0406b7b039}
+
+\item 
+\hypertarget{classNetwork_a7daffc01be38d41fb0bf8de762e12642}{}void {\bfseries read\+\_\+edgelist} (string filename, char sep= \textquotesingle{},\textquotesingle{})\label{classNetwork_a7daffc01be38d41fb0bf8de762e12642}
+
+\item 
+\hypertarget{classNetwork_a7955ccfdf8578129ff7d78b68b9b70e3}{}void {\bfseries write\+\_\+edgelist} (string filename, output\+Type names\+\_\+or\+\_\+ids, char sep= \textquotesingle{},\textquotesingle{})\label{classNetwork_a7955ccfdf8578129ff7d78b68b9b70e3}
+
+\item 
+\hypertarget{classNetwork_a715ff2af7d730dfbf6dcc7df6f1d5f1e}{}void {\bfseries graphviz} (string filename)\label{classNetwork_a715ff2af7d730dfbf6dcc7df6f1d5f1e}
+
+\item 
+\hypertarget{classNetwork_ad1a7e13122c4f9f57cf18c4209dfe36e}{}void {\bfseries dumper} ()\label{classNetwork_ad1a7e13122c4f9f57cf18c4209dfe36e}
+
+\item 
+\hypertarget{classNetwork_a4e178cc9e4b881720e87ee74079f3eca}{}bool {\bfseries gen\+\_\+deg\+\_\+series} (vector$<$ int $>$ \&deg\+\_\+series)\label{classNetwork_a4e178cc9e4b881720e87ee74079f3eca}
+
+\item 
+\hypertarget{classNetwork_af81e5b4d67998d298017ec9ec66484e2}{}vector$<$ state\+Type $>$ {\bfseries get\+\_\+states} ()\label{classNetwork_af81e5b4d67998d298017ec9ec66484e2}
+
+\item 
+\hypertarget{classNetwork_a1692dbef538bf487d16188a59b4e46a0}{}vector$<$ vector$<$ state\+Type $>$ $>$ {\bfseries get\+\_\+states\+\_\+by\+\_\+degree} ()\label{classNetwork_a1692dbef538bf487d16188a59b4e46a0}
+
+\item 
+\hypertarget{classNetwork_a5573ffefb3a8890ec33510268024c32f}{}double {\bfseries get\+\_\+coarse\+\_\+state} ()\label{classNetwork_a5573ffefb3a8890ec33510268024c32f}
+
+\item 
+\hypertarget{classNetwork_a4d400d268d537cbd00b1703a5ad74103}{}bool {\bfseries validate} ()\label{classNetwork_a4d400d268d537cbd00b1703a5ad74103}
+
+\item 
+\hypertarget{classNetwork_a8e72ffb8dcc1ea35bffbca3c1acb50d9}{}vector$<$ int $>$ {\bfseries get\+\_\+deg\+\_\+series} ()\label{classNetwork_a8e72ffb8dcc1ea35bffbca3c1acb50d9}
+
+\item 
+\hypertarget{classNetwork_a1472b8a33c27fccb2cd3b84062a6bb4b}{}vector$<$ int $>$ {\bfseries get\+\_\+deg\+\_\+dist} ()\label{classNetwork_a1472b8a33c27fccb2cd3b84062a6bb4b}
+
+\item 
+\hypertarget{classNetwork_a14841f262bd881614eb9311543fa0af7}{}vector$<$ double $>$ {\bfseries get\+\_\+gen\+\_\+deg\+\_\+dist} ()\label{classNetwork_a14841f262bd881614eb9311543fa0af7}
+
+\item 
+\hypertarget{classNetwork_aecc7b85001c902af1aa0a4b086fd0ed2}{}double {\bfseries mean\+\_\+deg} ()\label{classNetwork_aecc7b85001c902af1aa0a4b086fd0ed2}
+
+\item 
+\hypertarget{classNetwork_a436e1276adc9ba3fd7f7e6df05669694}{}map$<$ \hyperlink{classNode}{Node} $\ast$, int $>$ {\bfseries k\+\_\+shell\+\_\+decomposition} ()\label{classNetwork_a436e1276adc9ba3fd7f7e6df05669694}
+
+\item 
+\hypertarget{classNetwork_aea6f2b6662fb3894df7949ba44ff8b7c}{}double {\bfseries transitivity} ()\label{classNetwork_aea6f2b6662fb3894df7949ba44ff8b7c}
+
+\item 
+\hypertarget{classNetwork_a59d0553fe4819979e6bb432f2e4a2a99}{}double {\bfseries transitivity} (vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ node\+\_\+set)\label{classNetwork_a59d0553fe4819979e6bb432f2e4a2a99}
+
+\item 
+\hypertarget{classNetwork_a0668d8c063328bfe611f56c27509a8be}{}bool {\bfseries is\+\_\+weighted} ()\label{classNetwork_a0668d8c063328bfe611f56c27509a8be}
+
+\item 
+\hypertarget{classNetwork_a0a92d8f5afe94a16ed6446b6435959a5}{}double {\bfseries mean\+\_\+dist} (vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ node\+\_\+set)\label{classNetwork_a0a92d8f5afe94a16ed6446b6435959a5}
+
+\item 
+\hypertarget{classNetwork_a48d1feba1bd00925ef2b3b8710d7f237}{}void {\bfseries calculate\+\_\+distances} (vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ \&destinations, vector$<$ vector$<$ double $>$ $>$ \&distances)\label{classNetwork_a48d1feba1bd00925ef2b3b8710d7f237}
+
+\item 
+\hypertarget{classNetwork_a40116699c4df6117b9c24b877410520d}{}void {\bfseries print\+\_\+distances} (vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ \&full\+\_\+node\+\_\+set)\label{classNetwork_a40116699c4df6117b9c24b877410520d}
+
+\item 
+\hypertarget{classNetwork_a07a00fc58e7f7e0b63460c29084b8688}{}void {\bfseries stop\+\_\+processing} ()\label{classNetwork_a07a00fc58e7f7e0b63460c29084b8688}
+
+\item 
+\hypertarget{classNetwork_a4b96943d9095e3922741688add7ca818}{}void {\bfseries reset\+\_\+processing\+\_\+flag} ()\label{classNetwork_a4b96943d9095e3922741688add7ca818}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classNetwork_a6db9d28bd448a131448276ee03de1e6d}{}class {\bfseries Node}\label{classNetwork_a6db9d28bd448a131448276ee03de1e6d}
+
+\item 
+\hypertarget{classNetwork_ad2c8ba04c9d9989ccbf3c5aba267a3d7}{}class {\bfseries Edge}\label{classNetwork_ad2c8ba04c9d9989ccbf3c5aba267a3d7}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Network.\+h\item 
+Network.\+cpp\end{DoxyCompactItemize}

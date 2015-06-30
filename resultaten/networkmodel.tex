@@ -73,7 +73,7 @@ Above described experiments are repeated with the same simulation parameters and
 The expectation value $\mathbb{E}(\rho_N)$ and the variance $\texttt{var}(\rho_N(t))$ are monitored as a function of time for a collection of different means of the initial states. In Figure \ref{fig:variance_mean_high} the several orbits on the $(\mathbb{E}(\rho_N),\texttt{var}(\rho_N(t)))$-plane are shown for low, intermediate and high values of the average interaction strength.  
 
 
-\pagestyle{empty}
+%\pagestyle{empty}
 
 \begin{figure}
 \centering
@@ -100,15 +100,21 @@ The expectation value $\mathbb{E}(\rho_N)$ and the variance $\texttt{var}(\rho_N
 
 
 \begin{figure}
-\includegraphics[width=0.9\textwidth]{variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf}
-\caption{ Expectation and variance of average states for low average coupling: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$). For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
-\label{fig:fig:variance_mean_inter}
+\includegraphics[width=0.9\textwidth]{slaving_M10e4_N40-t_10e5}
+\caption{ Evolution on the $(\mathbb{E}(\rho_N),\texttt{var}(\rho_N(t)))$-plane is plotted with a blue line for the first 100 iterations and in red for the following iterations, until $t=10^5$. Parameters: $\bar{\nu}=0.3$, $\bar{\zeta}=0.03$, $\xi = 0.235$, $\bar{\mu}=0$ for $N=40$ agents and $M=10000$ independent realizations.}
+\label{slaving}
 \end{figure}
 
+
+%\begin{figure}
+%\includegraphics[width=0.9\textwidth]{variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf}
+%\caption{ Expectation and variance of average states for low average coupling: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$). For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
+%\end{figure}
+
 \begin{figure}
-\includegraphics[width=0.9\textwidth]{variance_mean_N1000_M500_mixed_fully_20timesteps.pdf}
-\caption{ Expectation and variance of average states for low average coupling: $\bar{\nu}=0.05$, $\bar{\zeta}=0.0167$). For each trajectory, we initialise $M=500$ independent simulations for $N=1000$ agents and iterate the model until $t=20$.}
-\label{fig:fig:variance_mean_mixed}
+\includegraphics[width=0.9\textwidth]{number_of_edges20.pdf}
+\caption{convergence}
+\label{fig:fig:conv}
 \end{figure}
 
 \newpage{}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.8.13)  19 JUN 2015 10:38
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012/Debian) (format=pdflatex 2013.8.13)  22 JUN 2015 10:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -483,14 +483,7 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip46
 )
-(./networkmodel.aux
-
-LaTeX Warning: Label `fig:fig:variance_mean_inter' multiply defined.
-
-
-LaTeX Warning: Label `fig:fig:variance_mean_mixed' multiply defined.
-
-)
+(./networkmodel.aux)
 \openout1 = `networkmodel.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
@@ -507,7 +500,8 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
- (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
+
+(/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count113
 \scratchdimen=\dimen123
@@ -623,18 +617,18 @@ sed on input line 93.
 
 LaTeX Warning: Float too large for page by 95.14941pt on input line 99.
 
-File: variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf Graphic file 
-(type pdf)
-<use variance_mean_N1000_M500_intermediate_fully_20timesteps.pdf>
-Package pdftex.def Info: variance_mean_N1000_M500_intermediate_fully_20timestep
-s.pdf used on input line 103.
-(pdftex.def)             Requested size: 310.4979pt x 234.065pt.
-File: variance_mean_N1000_M500_mixed_fully_20timesteps.pdf Graphic file (type p
-df)
+<slaving_M10e4_N40-t_10e5.pdf, id=28, 587.19376pt x 442.65375pt>
+File: slaving_M10e4_N40-t_10e5.pdf Graphic file (type pdf)
 
-<use variance_mean_N1000_M500_mixed_fully_20timesteps.pdf>
-Package pdftex.def Info: variance_mean_N1000_M500_mixed_fully_20timesteps.pdf u
-sed on input line 109.
+<use slaving_M10e4_N40-t_10e5.pdf>
+Package pdftex.def Info: slaving_M10e4_N40-t_10e5.pdf used on input line 103.
+(pdftex.def)             Requested size: 310.4979pt x 234.065pt.
+
+<number_of_edges20.pdf, id=29, 587.19376pt x 442.65375pt>
+File: number_of_edges20.pdf Graphic file (type pdf)
+
+<use number_of_edges20.pdf>
+Package pdftex.def Info: number_of_edges20.pdf used on input line 115.
 (pdftex.def)             Requested size: 310.4979pt x 234.065pt.
  [1
 
@@ -654,29 +648,26 @@ le page
 pdfTeX warning: pdflatex (file ./variance_mean_N1000_M500_mixed_fully_20timeste
 ps.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 
->] [4] [5] (./networkmodel.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 119.
- [6]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 119.
+>] [4 <./slaving_M10e4_N40-t_10e5.pdf>] (./networkmodel.bbl)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 125.
+ [5 <./number_of_edges20.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 125.
  (./networkmodel.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 119.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 119.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 125.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 125.
 Package rerunfilecheck Info: File `networkmodel.out' has not changed.
 (rerunfilecheck)             Checksum: 916CA6DCB99F12E2FBCA655C3709698F;334.
 
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 119.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 125.
  ) 
 Here is how much of TeX's memory you used:
- 7107 strings out of 493485
- 105468 string characters out of 3143526
- 190181 words of memory out of 3000000
- 10316 multiletter control sequences out of 15000+200000
+ 7119 strings out of 493485
+ 105772 string characters out of 3143526
+ 190170 words of memory out of 3000000
+ 10326 multiletter control sequences out of 15000+200000
  10809 words of font info for 43 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  42i,8n,40p,616b,495s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -692,10 +683,10 @@ fonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
 cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
 t10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm
 10.pfb>
-Output written on networkmodel.pdf (6 pages, 203732 bytes).
+Output written on networkmodel.pdf (5 pages, 1113862 bytes).
 PDF statistics:
- 308 PDF objects out of 1000 (max. 8388607)
- 181 compressed objects within 2 object streams
- 19 named destinations out of 1000 (max. 500000)
- 58 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 388 PDF objects out of 1000 (max. 8388607)
+ 213 compressed objects within 3 object streams
+ 18 named destinations out of 1000 (max. 500000)
+ 68 words of extra memory for PDF output out of 10000 (max. 10000000)
 

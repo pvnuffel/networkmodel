@@ -1,0 +1,106 @@
+\hypertarget{classChainBinomial__Sim}{}\section{Chain\+Binomial\+\_\+\+Sim Class Reference}
+\label{classChainBinomial__Sim}\index{Chain\+Binomial\+\_\+\+Sim@{Chain\+Binomial\+\_\+\+Sim}}
+Inheritance diagram for Chain\+Binomial\+\_\+\+Sim\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classChainBinomial__Sim}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classChainBinomial__Sim_a3d8360a4accc75a1fd05358cfea134c7}{}{\bfseries Chain\+Binomial\+\_\+\+Sim} (\hyperlink{classNetwork}{Network} $\ast$net, int infectious\+\_\+period, double T)\label{classChainBinomial__Sim_a3d8360a4accc75a1fd05358cfea134c7}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a7194af935f019e49e73858f726fb7db3}{}void {\bfseries set\+\_\+network} (\hyperlink{classNetwork}{Network} $\ast$net)\label{classChainBinomial__Sim_a7194af935f019e49e73858f726fb7db3}
+
+\item 
+\hypertarget{classChainBinomial__Sim_acb28925f5ef15976df7bd74bb5f475f5}{}void {\bfseries set\+\_\+infectious\+\_\+period} (int d)\label{classChainBinomial__Sim_acb28925f5ef15976df7bd74bb5f475f5}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a42bcc404ba9b7fa3dfe09bc261c18555}{}void {\bfseries set\+\_\+transmissibility} (double t)\label{classChainBinomial__Sim_a42bcc404ba9b7fa3dfe09bc261c18555}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a20bc89bd36f687b0fbf26eb0d791c942}{}vector$<$ double $>$ {\bfseries define\+\_\+time\+\_\+dist} ()\label{classChainBinomial__Sim_a20bc89bd36f687b0fbf26eb0d791c942}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a170153814fa16f65545aa9d84efc5d8a}{}int {\bfseries get\+\_\+infectious\+\_\+period} ()\label{classChainBinomial__Sim_a170153814fa16f65545aa9d84efc5d8a}
+
+\item 
+\hypertarget{classChainBinomial__Sim_af3a446813e5877097ae19eef01f42035}{}double {\bfseries get\+\_\+transmissibility} ()\label{classChainBinomial__Sim_af3a446813e5877097ae19eef01f42035}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a014207862000aa1ce033f151fa8bee66}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries rand\+\_\+infect} (int n)\label{classChainBinomial__Sim_a014207862000aa1ce033f151fa8bee66}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a3c4c019ab2f85962c28fe3dd85ee08ef}{}void {\bfseries infect\+\_\+node} (\hyperlink{classNode}{Node} $\ast$node)\label{classChainBinomial__Sim_a3c4c019ab2f85962c28fe3dd85ee08ef}
+
+\item 
+\hypertarget{classChainBinomial__Sim_affb5dba83fcb57724462b56fb0695ce0}{}void {\bfseries step\+\_\+simulation} ()\label{classChainBinomial__Sim_affb5dba83fcb57724462b56fb0695ce0}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a1dc4e4eedec788c0d783fbb8b6a70308}{}void {\bfseries run\+\_\+simulation} ()\label{classChainBinomial__Sim_a1dc4e4eedec788c0d783fbb8b6a70308}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a8d62910cfad67fe05f3a5de667ed6f9b}{}void {\bfseries add\+\_\+event} (\hyperlink{classNode}{Node} $\ast$sink\+\_\+node, int time, \hyperlink{classNode}{Node} $\ast$source\+\_\+node)\label{classChainBinomial__Sim_a8d62910cfad67fe05f3a5de667ed6f9b}
+
+\item 
+\hypertarget{classChainBinomial__Sim_aea23cd4cc94a78132e16c0eefcd70c71}{}int {\bfseries count\+\_\+infected} ()\label{classChainBinomial__Sim_aea23cd4cc94a78132e16c0eefcd70c71}
+
+\item 
+\hypertarget{classChainBinomial__Sim_afd59eb923a3c287787d914fc7d77c60f}{}int {\bfseries epidemic\+\_\+size} ()\label{classChainBinomial__Sim_afd59eb923a3c287787d914fc7d77c60f}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a837114b07c1655f241db8e31190289f6}{}vector$<$ int $>$ {\bfseries get\+\_\+epi\+\_\+curve} ()\label{classChainBinomial__Sim_a837114b07c1655f241db8e31190289f6}
+
+\item 
+\hypertarget{classChainBinomial__Sim_ac9d248964bc52237ae9698a0e1ca40af}{}vector$<$ int $>$ {\bfseries get\+\_\+prevalence\+\_\+curve} ()\label{classChainBinomial__Sim_ac9d248964bc52237ae9698a0e1ca40af}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a5e475fcdaca86cb4467f4c17e3240217}{}vector$<$ pair$<$ int, \hyperlink{classNode}{Node} $\ast$ $>$ $>$ {\bfseries get\+\_\+detailed\+\_\+epi\+\_\+curve} ()\label{classChainBinomial__Sim_a5e475fcdaca86cb4467f4c17e3240217}
+
+\item 
+\hypertarget{classChainBinomial__Sim_ad3be9818d5389bd0b507248454968a2a}{}void {\bfseries reset} ()\label{classChainBinomial__Sim_ad3be9818d5389bd0b507248454968a2a}
+
+\item 
+\hypertarget{classChainBinomial__Sim_abbdf731e6bdb9af8f17eac392ba81a6f}{}void {\bfseries summary} ()\label{classChainBinomial__Sim_abbdf731e6bdb9af8f17eac392ba81a6f}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classChainBinomial__Sim_a17cd2e68f958b9b818dc061221dca6cb}{}double {\bfseries T}\label{classChainBinomial__Sim_a17cd2e68f958b9b818dc061221dca6cb}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a94ddda2a0fa2a307e094e555d739b3e0}{}int {\bfseries infectious\+\_\+period}\label{classChainBinomial__Sim_a94ddda2a0fa2a307e094e555d739b3e0}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classChainBinomial__Sim_a28b17a028f8540dd8c9eea9b4afd8dc3}{}list$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries infected}\label{classChainBinomial__Sim_a28b17a028f8540dd8c9eea9b4afd8dc3}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a6f871e9e85e4dbf5dd8704d8e114adc9}{}vector$<$ \hyperlink{classNode}{Node} $\ast$ $>$ {\bfseries recovered}\label{classChainBinomial__Sim_a6f871e9e85e4dbf5dd8704d8e114adc9}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a3bf87d7371bb0d354ef9d8fe19c2ba50}{}vector$<$ double $>$ {\bfseries time\+\_\+dist}\label{classChainBinomial__Sim_a3bf87d7371bb0d354ef9d8fe19c2ba50}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a897837a54e9fccf9b6b8e4c0d4d66ca9}{}bool {\bfseries update\+\_\+time\+\_\+dist}\label{classChainBinomial__Sim_a897837a54e9fccf9b6b8e4c0d4d66ca9}
+
+\item 
+\hypertarget{classChainBinomial__Sim_ae0b621ed8981260be2c0b77587f847cc}{}priority\+\_\+queue$<$ \hyperlink{classEvent}{Event}, vector$<$ \hyperlink{classEvent}{Event} $>$, \hyperlink{classcompTime}{comp\+Time} $>$ {\bfseries transmission\+Q}\label{classChainBinomial__Sim_ae0b621ed8981260be2c0b77587f847cc}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a78b56d1a4485d37390fc017715763381}{}vector$<$ int $>$ {\bfseries epi\+\_\+curve}\label{classChainBinomial__Sim_a78b56d1a4485d37390fc017715763381}
+
+\item 
+\hypertarget{classChainBinomial__Sim_a321ab6e9f586ec9013f2cc8ecd1cf03b}{}vector$<$ pair$<$ int, \hyperlink{classNode}{Node} $\ast$ $>$ $>$ {\bfseries detailed\+\_\+epi\+\_\+curve}\label{classChainBinomial__Sim_a321ab6e9f586ec9013f2cc8ecd1cf03b}
+
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Chain\+Binomial\+\_\+\+Sim.\+h\end{DoxyCompactItemize}

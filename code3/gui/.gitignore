@@ -1,0 +1,9 @@
+dolphin.csv
+read_edgelist_test.cpp
+*.o
+*.a
+moc*
+epifire
+Makefile
+*.csv
+*.out
