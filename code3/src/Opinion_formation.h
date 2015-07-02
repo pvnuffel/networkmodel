@@ -7,13 +7,14 @@
 class Opinion_formation: public Simulator
 {
   // private:   FILE *file;
- protected:   double  beta=8;    // let op: non-static data member initializers only available with -std=c++11 or -std=gnu++11 [enabled by default]
+ protected:   double  beta=10;    // let op: non-static data member initializers only available with -std=c++11 or -std=gnu++11 [enabled by default]
   
  public:    ofstream outfile; 
   
         Opinion_formation():Simulator() {};
   // Opinion_formation(Network* net,string &filename ):Simulator(net, filename) {};
  Opinion_formation(Network* net):Simulator(net) {};
+  //Opinion_formation(vector<Network*> net_list,string &filename):Simulator(net_list, filename) {};
         ~Opinion_formation() { };
 
        
@@ -50,8 +51,9 @@ class Opinion_formation: public Simulator
 	 }	 
        }
        
-   
-       
+ 
+	 
+
 
 
   /* void newFile() */

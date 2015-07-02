@@ -984,28 +984,6 @@ void Network::initialize(double mean_coupling, double var_coupling, double mean_
         }
 
 
-void Network::lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U) {              //verschuif naar klasse Opinion_formation?
-	    for (int i = 0; i < size(); i++) {
-	      double preference =   mtrand.randNorm(mean_preference, var_preference); //uses box-muller-method
-	      while (preference <-1 ||  preference >1  ) {                    //discard values out of our constraints on interval
-		preference=  mtrand.randNorm(mean_preference, var_preference);  
-	      }
-              node_list[i]->set_preference(preference); 
-	      //  cerr << "preference test output" << preference  << "\n\n";
-	      double coupling = mtrand.randNorm(mean_coupling, var_coupling);
-	      while ( coupling<0 ||  coupling >1  ) { 
-		coupling = mtrand.randNorm(mean_coupling, var_coupling);
-	      }
-	      node_list[i]->set_coupling(coupling); 
-
-	      if (mtrand.rand() < U[i])     
-                  node_list[i]->set_state(1); 
-              else node_list[i]->set_state(0); 
-            };
-        }
-
-
-
 vector<stateType> Network::get_node_states() {
     vector<stateType> states;
     for (int i = 0; i < size() ; i++) {

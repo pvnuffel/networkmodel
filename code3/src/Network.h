@@ -212,6 +212,8 @@ class Network
         void set_node_states(vector<stateType> &states);
         //void set_node_to_random_states(stateType s);  //set all nodes at a random state
         void initialize(double mean_coupling, double var_coupling, double mean_preference, double var_preference, double mean_initial_state);  //set all nodes at a random state, preference, coupling.
+	void lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U);  
+
 
         inline void set_topology_altered(bool flag) { _topology_altered = flag; }
 
