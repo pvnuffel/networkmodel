@@ -163,7 +163,7 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
     return   U_coarse /= M;    
 }
 
-double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+double coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   double U_coarse =0;
        for(int j= 0; j < M; j++)
@@ -174,6 +174,13 @@ double derivative_coarse_step(double U_guess, double mean_coupling, double var_c
 	   U_coarse += network->get_coarse_state();   //what with realizations cancelling each other out?
 	 }
     return   U_coarse /= M;    
+}
+
+
+double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) //nog implementeren
+{
+  double epsilon = 1e-5;
+  return (coarse_step(U_guess + epsilon, mean_couling,var_coupling, mean_reference, var_preference, network, M, time_horizon)  - coarse_step(U_guess, mean_couling,var_coupling, mean_reference, var_preference, network, M, time_horizon ) )/epsilon;
 }
 
 
@@ -398,7 +405,7 @@ int main(int argc, char* argv[])  {
        newton_raphson_analytical(U_guess, mean_coupling, mean_preference, var_preference);
 
 
-       // LIFTING
+       // LIFTING/restriction
        int time_horizon = 1; // 20;
        Network*  network =  construct_network(network_type, network_size, degree, p_rewiring);
        //   newton_raphson(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon);  
