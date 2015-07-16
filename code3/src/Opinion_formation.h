@@ -39,7 +39,7 @@ class Opinion_formation: public Simulator
 	      }	 //   initial_average += net_list[j]->get_coarse_state();
 	 // };
 	 //	 fprintf(file, "%d %f\n", time,net->get_coarse_state()  );
-	  coarse_states.push_back(net->get_coarse_state()); 
+	      coarse_states.push_back(net->get_coarse_state()); //saves coarse_state on each timestep as last entry in a vector
        }
 
        void run_simulation(int max_time)

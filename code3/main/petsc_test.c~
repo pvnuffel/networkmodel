@@ -1,0 +1,40 @@
+static char help[] = "Synchronized printing.\n\n";
+
+#include 
+int main(int argc,char **argv)
+{
+  PetscErrorCode ierr;
+  PetscMPIInt    rank,size;
+
+  ierr = PetscInitialize(&argc;,&argv;,PETSC_NULL,help);
+  CHKERRQ(ierr);
+
+  ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size;);
+  CHKERRQ(ierr);
+
+  ierr = MPI_Comm_rank(PETSC_COMM_WORLD,&rank;);
+  CHKERRQ(ierr);
+
+  ierr = PetscPrintf(PETSC_COMM_WORLD,
+         "Number of processors = %d, rank = %d\n",size,rank);
+  CHKERRQ(ierr);
+
+  ierr = PetscSynchronizedPrintf(PETSC_COMM_WORLD,
+         "[%d] Synchronized Hello World.\n",rank);
+  CHKERRQ(ierr);
+
+  ierr = PetscSynchronizedPrintf(PETSC_COMM_WORLD,i
+         "[%d] Synchronized Hello World - Part II.\n",rank);
+  CHKERRQ(ierr);
+
+  ierr = PetscSynchronizedFlush(PETSC_COMM_WORLD);
+  CHKERRQ(ierr);
+
+  ierr = MPI_Barrier(PETSC_COMM_WORLD);CHKERRQ(ierr);
+
+  ierr = PetscPrintf(PETSC_COMM_SELF,"[%d] Jumbled Hello World\n",rank);
+  CHKERRQ(ierr);
+
+  ierr = PetscFinalize();
+  return 0;
+}

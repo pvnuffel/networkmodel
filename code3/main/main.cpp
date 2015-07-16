@@ -5,6 +5,10 @@
 #include "string.h"
 #include "sys/times.h"
 #include "sys/vtimes.h"
+
+// #include <petsc.h>
+// #include <petsctao.h>
+
 //#include <math.h>    
 
 static clock_t lastCPU, lastSysCPU, lastUserCPU;
@@ -150,6 +154,8 @@ double newton_raphson_analytical(double U_guess, double mean_coupling, double me
     cerr << "Error, no convergence in Newton Raphson \n";
 }
 
+
+
 double coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   double U_coarse =0;
@@ -163,24 +169,39 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
     return   U_coarse /= M;    
 }
 
-double coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+
+rowvec get_new_states(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
-  double U_coarse =0;
-       for(int j= 0; j < M; j++)
+
+  rowvec u_coarse_states  = zeros<vec>(M); 
+        for(int j= 0; j < M; j++)
 	 {   
 	   network->initialize(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);
-	   U_coarse += network->get_coarse_state();   //what with realizations cancelling each other out?
+	   u_coarse_states(j) = network->get_coarse_state();   //what with realizations cancelling each other out?
 	 }
-    return   U_coarse /= M;    
+	return   u_coarse_states; 
 }
 
+void calculate_weights (rowvec u_coarse_states)
+{
+  M = u_coarse_states.n_elem;
+  mat  C0 =  eye<mat>(M,M);
+  mat C1 = C0.insert_rows( M, u_coarse_states ) ;
+  mat C2 = C1.insert_rows( M+1,  ones(M) )    ;  
+  mat bli =  // u_coarse_states.insert_row()
+  mat bla = join_cols (
+  mat X = join_rows(A,B);
+  mat C ;
+  mat R2 = chol(Y, "lower");
+
+}
 
 double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) //nog implementeren
 {
   double epsilon = 1e-5;
-  return (coarse_step(U_guess + epsilon, mean_couling,var_coupling, mean_reference, var_preference, network, M, time_horizon)  - coarse_step(U_guess, mean_couling,var_coupling, mean_reference, var_preference, network, M, time_horizon ) )/epsilon;
+  return (coarse_step(U_guess + epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon)  - coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) )/epsilon;
 }
 
 
@@ -277,6 +298,8 @@ double fixpoint_iteration(double U_guess, double mean_coupling, double var_coupl
 
 
 
+
+
 int main(int argc, char* argv[])  {
 
   vector<Network*> net_list;  
@@ -286,6 +309,41 @@ int main(int argc, char* argv[])  {
   FILE *file_s0, *file_s1, *file_m, *file_mean, *file_var, *file;
   time_t starttime; 
   bool separate_coarse_states = false;
+
+
+
+//   PetscErrorCode ierr; /* used to check for functions returning nonzeros */
+//   Vec x; /* solution vector */
+//   Mat H; /* Hessian matrix */
+//   Tao tao; /* Tao context */
+//   AppCtx user; /* user-defined application context */
+//   PetscInitialize(&argc,&argv,(char*)0,0);
+//   ierr = PetscPrintf( PETSC_COMM_WORLD, "\nHello World\n" );CHKERRQ(ierr);
+//   /* Initialize problem parameters */
+//   user.n = 2; user.alpha = 99.0;
+// /* Allocate vectors for the solution and gradient */
+//   ierr = VecCreateSeq(PETSC_COMM_SELF,user.n,&x); CHKERRQ(ierr);
+//   ierr = MatCreateSeqBAIJ(PETSC_COMM_SELF,2,user.n,user.n,1,NULL,&H);
+//   /* Create TAO solver with desired solution method */
+//   ierr = TaoCreate(PETSC_COMM_SELF,&tao); CHKERRQ(ierr);
+//   ierr = TaoSetType(tao,TAOLMVM); CHKERRQ(ierr);
+//   /* Set solution vec and an initial guess */
+//   ierr = VecSet(x, 0); CHKERRQ(ierr);
+//   ierr = TaoSetInitialVector(tao,x); CHKERRQ(ierr);
+// /* Set routines for function, gradient, hessian evaluation */
+//   ierr = TaoSetObjectiveAndGradientRoutine(tao,FormFunctionGradient,&user);
+//   ierr = TaoSetHessianRoutine(tao,H,H,FormHessian,&user); CHKERRQ(ierr);
+//   /* Check for TAO command line options */
+//   ierr = TaoSetFromOptions(tao); CHKERRQ(ierr);
+// /* Solve the application */
+//   ierr = TaoSolve(tao); CHKERRQ(ierr);
+//   /* Free data structures */
+//   ierr = TaoDestroy(&tao); CHKERRQ(ierr);
+//   ierr = VecDestroy(&x); CHKERRQ(ierr);
+//   ierr = MatDestroy(&H); CHKERRQ(ierr);
+//   PetscFinalize();
+
+ 
 
   // cout << "armadillotest"  << endl;
   // // vec y = zeros<vec>(5);  
@@ -325,6 +383,7 @@ int main(int argc, char* argv[])  {
  if (time_steps == 0) time_steps = 30;
  if (M== 0) M = 100;
  if (network_size== 0) network_size = 400;
+ if (network_type.compare("0")==0) network_type="random";
  if ( degree== 0) degree =(int) network_size/40;  
  if (average_state == 0) average_state = 0.5;
  if (var_preference == 0) var_preference = 0.236;    
