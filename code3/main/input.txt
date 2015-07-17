@@ -1,4 +1,4 @@
-20 
+10 
 100
 400
 fully_connected

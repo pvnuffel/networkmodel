@@ -170,32 +170,79 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
 }
 
 
-rowvec get_new_states(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
-{
 
-  rowvec u_coarse_states  = zeros<vec>(M); 
-        for(int j= 0; j < M; j++)
-	 {   
-	   network->initialize(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
-	   Opinion_formation sim(network); 
-	   sim.run_simulation(time_horizon);
-	   u_coarse_states(j) = network->get_coarse_state();   //what with realizations cancelling each other out?
+
+// rowvec get_new_states(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+// {
+
+//   rowvec u_coarse_states  = zeros<vec>(M); 
+//   for(int j= 0; j < M; j++)
+//     {   
+//       network->initialize(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
+//       Opinion_formation sim(network); 
+//       sim.run_simulation(time_horizon);
+//       u_coarse_states(j) = network->get_coarse_state();   //what with realizations cancelling each other out?
+//     }
+//   return   u_coarse_states; 
+// }
+
+rowvec sample_states (double U_guess, int M)
+{ 
+  MTRand mtrand;
+  rowvec sampled_states = zeros<rowvec>(M); 
+        for(int m= 0; m < M; m++)
+	  {   
+	    if (mtrand.rand() < U_guess)     
+	      sampled_states(m) = 1;
+	    else sampled_states(m)=0; 
 	 }
-	return   u_coarse_states; 
+	cout << "sampled s0: " <<  sampled_states[0] << endl;
+		cout << "sampled s1: " <<  sampled_states[1] << endl;
+		cout << "sampled sM: " <<  sampled_states[M] << endl;
+		cout << "sampled sM: " <<  sampled_states[M+1] << endl;
+	return sampled_states;
+
 }
 
-void calculate_weights (rowvec u_coarse_states)
-{
-  M = u_coarse_states.n_elem;
-  mat  C0 =  eye<mat>(M,M);
-  mat C1 = C0.insert_rows( M, u_coarse_states ) ;
-  mat C2 = C1.insert_rows( M+1,  ones(M) )    ;  
-  mat bli =  // u_coarse_states.insert_row()
-  mat bla = join_cols (
-  mat X = join_rows(A,B);
-  mat C ;
-  mat R2 = chol(Y, "lower");
 
+
+vec calculate_weights (rowvec u_realizations, double U)
+{
+  int M = u_realizations.n_elem;
+  u_realizations.print();
+  cout << "M= "  << M << endl;
+  mat I =  eye<mat>(M,M);
+  mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
+  mat D;
+  D << 1 << 3 << 5 << endr     << 2 << 4 << 6 << endr;
+  // cout << "check (1,2)=3 : " <<  D[1,2] << endl;
+  cout << "sampled check (1,2): " <<  C[1,2] << endl;
+  mat A_l = join_cols(I, C);
+  mat A_r =  join_cols( C.t(), zeros<mat>(2,2));
+  mat A = join_rows(A_l,A_r);
+  //A.print();
+  // mat R2 = chol(A);  failed to converge
+  // R2.print();
+  vec b;
+  b << U*M << M;
+  vec g = ones<vec>(M);
+  vec B= join_cols(g,b);
+  vec X = solve(A,B);
+  vec W =  zeros<vec>(M);
+  for (int m=0; m < M; m++)
+    {
+      if ( X[m] <0 ) cerr << "error: negative weight!" << endl;
+      else W[m]= X[m];
+    }
+  X.print();
+  cout << "Constraints fulfilled? Check if  " <<  u_realizations*W/M << " =   " <<  U  << endl << " and " << sum(W) << " = " << M << endl; 
+  // double delta = 1e-3; 
+  // if ( (sum(W) -M > delta)  || (  ((double)  u_realizations*W )/M -U) > delta )
+  //     {
+  // 	cerr << "Constraints not fulfilled in calculated weights" << endl;
+  //     }
+ 
+  return W;
 }
 
 double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) //nog implementeren
@@ -353,7 +400,7 @@ int main(int argc, char* argv[])  {
   // vec q = square(z);
   // cout << q[0] << endl;
 
-  //MTRand* mtrand;
+
   // cout<<  "argc: "<< argc <<"\n" ;
     // We print argv[0] assuming it is the program name.
       
@@ -460,23 +507,24 @@ int main(int argc, char* argv[])  {
 
        // solve for equilibrium state
        double U_guess=average_state;
-       fixpoint_iteration_analytical(U_guess, mean_coupling, mean_preference, var_preference);
-       newton_raphson_analytical(U_guess, mean_coupling, mean_preference, var_preference);
+       // fixpoint_iteration_analytical(U_guess, mean_coupling, mean_preference, var_preference);
+       //  newton_raphson_analytical(U_guess, mean_coupling, mean_preference, var_preference);
 
 
        // LIFTING/restriction
-       int time_horizon = 1; // 20;
-       Network*  network =  construct_network(network_type, network_size, degree, p_rewiring);
+       // int time_horizon = 1; // 20;
+       // Network*  network =  construct_network(network_type, network_size, degree, p_rewiring);
        //   newton_raphson(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon);  
-       fixpoint_iteration(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon);  
+       //    fixpoint_iteration(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon);  
        // vector<double> U;
        // for (int i=0; i < network_size; i++)
        // 	 { U.push_back(0.4);}  //Suppose U is a N-dim testvector     zoals  U = net->get_node_states(); hoewel in het algemeen is elke toestand reëel getal is ipv (0,1)
  
-
-       
-       
-
+       double U= 0.7; //average_state;
+       double epsilon = 1e-3;
+       rowvec u_realizations = sample_states(U,M);
+       calculate_weights(u_realizations,U);
+       calculate_weights(u_realizations, U+epsilon);
 
 
        char temp[4096];

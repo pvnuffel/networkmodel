@@ -1,4 +1,4 @@
-CFLAGS=--ansi --pedantic -O2 -g -Wall  
+CFLAGS=--ansi --pedantic -O2 -g  
 
  # compiler flags:
   #  -g    adds debugging information to the executable file
@@ -7,8 +7,8 @@ CFLAGS=--ansi --pedantic -O2 -g -Wall
 INCLUDE= -I../src/
 LDFLAGS=  ../src/*.o
 
-include ${PETSC_DIR}/lib/petsc/conf/variables
-include ${PETSC_DIR}/lib/petsc/conf/rules
+# include ${PETSC_DIR}/lib/petsc/conf/variables
+# include ${PETSC_DIR}/lib/petsc/conf/rules
 
 all:  src gsl  main    
 
