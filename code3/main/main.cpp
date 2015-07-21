@@ -169,6 +169,19 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
     return   U_coarse /= M;    
 }
 
+double weighted_lifting(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+{
+  double U_coarse =0;
+       for(int j= 0; j < M; j++)
+	 {   
+	   network->initialize(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
+	   Opinion_formation sim(network); 
+	   sim.run_simulation(time_horizon);
+	   U_coarse += network->get_coarse_state();   //what with realizations cancelling each other out?
+	 }
+    return   U_coarse /= M;    
+}
+
 
 
 
@@ -214,9 +227,9 @@ vec calculate_weights (rowvec u_realizations, double U)
   mat I =  eye<mat>(M,M);
   mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
   mat D;
-  D << 1 << 3 << 5 << endr     << 2 << 4 << 6 << endr;
+  //D << 1 << 3 << 5 << endr     << 2 << 4 << 6 << endr;
   // cout << "check (1,2)=3 : " <<  D[1,2] << endl;
-  cout << "sampled check (1,2): " <<  C[1,2] << endl;
+  //cout << "sampled check (1,2): " <<  C[1,2] << endl;
   mat A_l = join_cols(I, C);
   mat A_r =  join_cols( C.t(), zeros<mat>(2,2));
   mat A = join_rows(A_l,A_r);
@@ -241,7 +254,15 @@ vec calculate_weights (rowvec u_realizations, double U)
   //     {
   // 	cerr << "Constraints not fulfilled in calculated weights" << endl;
   //     }
- 
+  FILE  *file_weights;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
+  file_weights= fopen(temp, "w");
+  if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
+  for (int m=0; m < M; m++) {
+    fprintf(file_weights, "%d %f \n", m, W(m) );
+  }  
+  
   return W;
 }
 
