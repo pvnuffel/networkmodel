@@ -92,6 +92,11 @@ Network::~Network() {
 }
 
 
+void Network::set_seed (double seed)
+{
+  mtrand.seed(seed);
+}
+
 void Network::populate( int n ) {
     for (int i = 0; i < n; i++) {
         add_new_node();
@@ -984,7 +989,29 @@ void Network::initialize(double mean_coupling, double var_coupling, double mean_
         }
 
 
-void Network::lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U) {              //verschuif naar klasse Opinion_formation?
+// void Network::lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U) {              //verschuif naar klasse Opinion_formation?
+// 	    for (int i = 0; i < size(); i++) {
+// 	      double preference =   mtrand.randNorm(mean_preference, var_preference); //uses box-muller-method
+// 	      while (preference <-1 ||  preference >1  ) {                    //discard values out of our constraints on interval
+// 		preference=  mtrand.randNorm(mean_preference, var_preference);  
+// 	      }
+//               node_list[i]->set_preference(preference); 
+// 	      //  cerr << "preference test output" << preference  << "\n\n";
+// 	      double coupling = mtrand.randNorm(mean_coupling, var_coupling);
+// 	      while ( coupling<0 ||  coupling >1  ) { 
+// 		coupling = mtrand.randNorm(mean_coupling, var_coupling);
+// 	      }
+// 	      node_list[i]->set_coupling(coupling); 
+
+// 	      if (mtrand.rand() < U[i])     
+//                   node_list[i]->set_state(1); 
+//               else node_list[i]->set_state(0); 
+//             };
+//         }
+
+void  Network::lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, double mean_U) {              //verschuif naar klasse Opinion_formation?
+
+  //vec u_n_states = zeros<rowvec>(size()); 
 	    for (int i = 0; i < size(); i++) {
 	      double preference =   mtrand.randNorm(mean_preference, var_preference); //uses box-muller-method
 	      while (preference <-1 ||  preference >1  ) {                    //discard values out of our constraints on interval
@@ -998,11 +1025,14 @@ void Network::lift(double mean_coupling, double var_coupling, double mean_prefer
 	      }
 	      node_list[i]->set_coupling(coupling); 
 
-	      if (mtrand.rand() < U[i])     
+	      //     if( i ==7) { cout << mtrand.rand()<< endl; }
+	      if (mtrand.rand() < mean_U)        //Bernouilli probability defined as 0.5 by default 
                   node_list[i]->set_state(1); 
               else node_list[i]->set_state(0); 
             };
         }
+
+
 
 
 

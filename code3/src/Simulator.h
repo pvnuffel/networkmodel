@@ -21,7 +21,8 @@ class Simulator
 	vector<double> coarse_states;
         Simulator() { time = 0; net=NULL; mtrand=NULL; };
 	//   Simulator(Network* net) { this->net = net; this->time = 0; this->mtrand = net->get_rng();};	//   Simulator(Network* net) { this->net = net; this->time = 0; this->mtrand = net->get_rng()};
-        Simulator(Network* net)  {this->net = net; this->time = 0; this->mtrand = net->get_rng(); this->coarse_states = get_coarse_states(); };
+        Simulator(Network* net)  {this->net = net; this->mtrand = net->get_rng(); this->time = 0; this->coarse_states = get_coarse_states(); };
+	//    	Simulator(Network* net, MTRand mtrand)  {this->net = net; this->time = 0; this.mtrand= mtrand, this->coarse_states = get_coarse_states(); };
 
         void set_network( Network* net ) { this->net = net; this->mtrand = net->get_rng(); };
         Network* network() { return(net); };
@@ -74,17 +75,7 @@ class Simulator
         /*     return sample; */
         /* } */
 
-        /* double calc_critical_transmissibility() { */
-        /*     vector<double> dist = net->get_gen_deg_dist(); */
-        /*     double numerator = 0;// mean degree, (= <k>) */
-        /*                          // mean sq(deg) - mean deg (= <k^2> - <k>) */
-        /*     double denominator = 0; */
-        /*     for (unsigned int k=1; k < dist.size(); k++) { */
-        /*         numerator += k * dist[k]; */
-        /*         denominator += k * (k-1) * dist[k]; */
-        /*     } */
-        /*     return numerator/denominator; */
-        /* } */
+
 
 
         //these functions must be derived in child class

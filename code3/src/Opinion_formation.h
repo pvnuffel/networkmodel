@@ -14,6 +14,7 @@ class Opinion_formation: public Simulator
         Opinion_formation():Simulator() {};
   // Opinion_formation(Network* net,string &filename ):Simulator(net, filename) {};
  Opinion_formation(Network* net):Simulator(net) {};
+  // Opinion_formation(Network* net, MTRand mtrand):Simulator(net, mtrand) {};
   //Opinion_formation(vector<Network*> net_list,string &filename):Simulator(net_list, filename) {};
         ~Opinion_formation() { };
 
@@ -42,7 +43,7 @@ class Opinion_formation: public Simulator
 	      coarse_states.push_back(net->get_coarse_state()); //saves coarse_state on each timestep as last entry in a vector
        }
 
-       void run_simulation(int max_time)
+       void run_simulation(int max_time )
        {
 	 coarse_states.push_back(net->get_coarse_state()); 
 	 while (time <max_time) {

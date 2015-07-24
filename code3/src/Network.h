@@ -138,6 +138,8 @@ class Network
         /***************************************************************************
          * Network Modifier Functions
          **************************************************************************/
+	
+	void set_seed(double seed); // the rng can be seeded at any time by calling mtrand->seed(your_seed);  //this line added by pvn
         Node* add_new_node();    //creates new node and adds it to the network
         void populate(int n);    //add "n" new nodes to the network
                                  // add an existing node to the network
@@ -212,7 +214,8 @@ class Network
         void set_node_states(vector<stateType> &states);
         //void set_node_to_random_states(stateType s);  //set all nodes at a random state
         void initialize(double mean_coupling, double var_coupling, double mean_preference, double var_preference, double mean_initial_state);  //set all nodes at a random state, preference, coupling.
-	void lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U);  
+	//	void lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, vector<double> U);  
+	void lift(double mean_coupling, double var_coupling, double mean_preference, double var_preference, double U);  
 
 
         inline void set_topology_altered(bool flag) { _topology_altered = flag; }
