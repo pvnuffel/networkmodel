@@ -207,18 +207,20 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
        for(int j= 0; j < M; j++)
 	 {   
 	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
+	   double state_before = network->get_node(7)->get_state();
+	   //	   cout <<  "state_before= " << state_before << endl;
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);	  
 	   // U_coarse += network->get_coarse_state();   //what with realizations cancelling each other out?
 	   double state = network->get_node(7)->get_state();
-	  	   cout << state << endl;
+	   //	   cout << "state_after= " << state << endl;
 	   U_coarse +=state;   //what with realizations cancelling each other out?
 	 }
        
     return   U_coarse /= M;    
 }
 
-double lift_restict(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+double lift_restrict(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   // network->set_seed(1);
   double U_coarse =0;
@@ -227,7 +229,7 @@ double lift_restict(double U_guess, double mean_coupling, double var_coupling, d
 	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
 	   // U_coarse += network->get_coarse_state();   //what with realizations cancelling each other out?
 	   double state = network->get_node(7)->get_state();
-	  	   cout << state << endl;
+	   //	   cout << state << endl;
 	   U_coarse +=state;   //what with realizations cancelling each other out?
 	 }
        
@@ -249,7 +251,7 @@ double lift_restrict_weighted(double U_guess, double mean_coupling, double var_c
 	   // Opinion_formation sim(network); 
 	   //	   sim.run_simulation(time_horizon);
 	 }
-        sampled_states.print();
+       //    sampled_states.print();
        vec w= calculate_weights(sampled_states, U_guess);
        return dot(sampled_states,w)/M;
     
@@ -272,12 +274,11 @@ double coarse_step_weighted(double U_guess, double mean_coupling, double var_cou
 	   sim.run_simulation(time_horizon);
 	   new_states(j)= network->get_node(7)->get_state();
 	 }
-	   vec w= calculate_weights(sampled_states, U_guess);
-       cout << "before simulation" << endl;
-       sampled_states.print();
-       
-       cout << "after simulation" << endl;
-        new_states.print();
+       vec w= calculate_weights(sampled_states, U_guess);
+       // cout << "before simulation" << endl;
+       // sampled_states.print();       
+       // cout << "after simulation" << endl;
+       // new_states.print();
        return dot(new_states,w)/M;
     
 }
@@ -308,26 +309,59 @@ rowvec sample_states (double U_guess, int M)
 
 double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed) 
 {
- double epsilon = 1e-4;
- network->set_seed(seed);
- double Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
- network->set_seed(seed);
- double U= coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
- cout << "difference: U+eps " << Ueps   <<  " U= " << U << endl;
- 
+ // double epsilon = 1e-4;
+ // network->set_seed(seed);
+ // double Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+ // network->set_seed(seed);
+ // double U= coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+ // cout << "difference: U+eps " << Ueps   <<  " U= " << U << endl;
+
+  double epsilon = 1e-20;
+  double Ueps ;
+  double U;
+
+  FILE  *file_eps;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "epsilon", ".dat");
+  file_eps = fopen(temp, "w");
+  if (file_eps == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
+  while (epsilon < 0.1)
+      { // double epsilon = 1e-4;
+       	network->set_seed(seed);
+	Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	network->set_seed(seed);
+	U= coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+	//	fprintf(file_eps, "%e %e \n", epsilon, abs(Ueps-U) );
+	fprintf(file_eps, "%e %e \n", epsilon, abs(epsilon - Ueps +U) ); //F(U+e)-F(U)
+	cout << "epsilon= " << epsilon << " difference (weighted):|Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	epsilon*=10;
+      }    
  return (Ueps-U)/epsilon;
+ 
 }
 
 
 double derivative_coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed) 
 {
- double epsilon = 1e-4;
- network->set_seed(seed);
- double Ueps = coarse_step_weighted(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
- network->set_seed(seed);
- double U= coarse_step_weighted(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
- cout << "difference (weighted): U+eps " << Ueps   <<  " U= " << U << endl;
- 
+  double epsilon = 1e-19;
+  double Ueps ;
+  double U;
+  FILE  *file_eps_w;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "epsilon_weighted", ".dat");
+  file_eps_w = fopen(temp, "w");
+  if (file_eps_w == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
+  while (epsilon < 1)
+      { // double epsilon = 1e-4;
+       	network->set_seed(seed);
+	Ueps = coarse_step_weighted(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	network->set_seed(seed);
+	U= coarse_step_weighted(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
+	fprintf(file_eps_w, "%e %e \n", epsilon, abs( epsilon - Ueps +U) ); //F(U+e)-F(U)
+	cout << "epsilon= " << epsilon << " difference (weighted): |Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	epsilon*=10;
+      }
  return (Ueps-U)/epsilon;
 }
 
@@ -626,24 +660,30 @@ cout << "RG seed  = "<< rg_seed <<  endl;
        // 	 { U.push_back(0.4);}  //Suppose U is a N-dim testvector     zoals  U = net->get_node_states(); hoewel in het algemeen is elke toestand reëel getal is ipv (0,1)
  
        //double U= 0.7; //average_state;
-       double epsilon = 1e-3;
+	//       double epsilon = 1e-3;
        // rowvec u_realizations = sample_states(U,M);
        // calculate_weights(u_realizations,U);
        //       calculate_weights(u_realizations, U+epsilon);
   
        //  newton_raphson_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, mtrand);  
        network->set_seed(rg_seed);
-       cout << "check identity relation: U: " << coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+       cout << "check identity relation: U: " << lift_restrict(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
        network->set_seed(rg_seed);
-       cout << "checksame random values " << endl;
-       cout << "U =" <<  coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
        cout << "check identity relation using weights" << endl;
+       cout <<   "U: " <<   lift_restrict_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+       network->set_seed(rg_seed);
+       cout << "course step" << endl;
+       network->set_seed(rg_seed);
+       cout << "U =" <<  coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+       cout << "weighted course step" << endl;
        network->set_seed(rg_seed);
        cout <<   "U: " <<   coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
        cout << "checksame random values " << endl;
        network->set_seed(rg_seed);
        cout <<   "U: " <<   coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-       
+       cout <<  "derivative" <<   derivative_coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, rg_seed) << endl;  
+       cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, rg_seed) << endl;  
+
 char temp[4096];
        sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_o", ".dat");
        file= fopen(temp, "w");

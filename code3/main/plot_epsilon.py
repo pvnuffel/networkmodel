@@ -32,9 +32,18 @@ ymin = 1e-18
 ymax = 1
 pl.axis([xmin, xmax, ymin, ymax])
 
-pl.set_ylabel(r'$P \ (\Delta x) $', fontsize=15)
-pl.set_xlabel(r'$\frac{\Delta x}{\sigma} $', fontsize=15)
+pl.yscale('log')
+pl.xscale('log')
+
+pl.xlabel(r'$\epsilon $', fontsize=15)
+pl.ylabel(r'$\phi_T(U +\epsilon) -\phi_T(U) $', fontsize=15)
 #ax1.set_xlim(-4, 4)
 #ax1.set_ylim(0, 1)
 #plt.savefig(plotname, dpi=100) 
-plt.show()
+
+#pl.legend([plot, plot2], ('add', 'mul'), 'best', numpoints=1)
+#pl.legend([line1, line2, line3],  'best')
+#pl.legend( loc='best', numpoints = 1 )
+#first_legend = pl.legend([line1], loc=1)
+pl.legend(bbox_to_anchor=(1, 0.96), numpoints = 1 )
+pl.show()
