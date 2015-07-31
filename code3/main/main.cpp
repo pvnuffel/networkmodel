@@ -5,6 +5,9 @@
 #include "string.h"
 #include "sys/times.h"
 #include "sys/vtimes.h"
+#include <iostream>
+#include <fstream>
+
 
 // #include <petsc.h>
 // #include <petsctao.h>
@@ -175,7 +178,7 @@ vec calculate_weights (rowvec u_realizations, double U)
   b << U*M << M;
   vec g = ones<vec>(M);
   vec B= join_cols(g,b);
-  vec X = solve(A,B);
+  vec X = solve(A,B);  //should be replaced by cholevsky
   vec W =  zeros<vec>(M);
   for (int m=0; m < M; m++)
     {
@@ -200,9 +203,65 @@ vec calculate_weights (rowvec u_realizations, double U)
   return W;
 }
 
+vec calculate_weights2 (mat u_realizations, vec U)
+{
+  int M = u_realizations.n_cols;
+  int N= u_realizations.n_rows;
+  // u_realizations.print();
+  // cout << "M= "  << M << endl;
+  mat I =  eye<mat>(M,M);
+  mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
+
+  mat A_l = join_cols(I, C);
+  mat A_r =  join_cols( C.t(), zeros<mat>(N+1,N+1));
+  mat A = join_rows(A_l,A_r);
+  cout << "print A" << endl; A.print();
+  // mat R2 = chol(A);  failed to converge
+  // R2.print();
+
+
+  vec norm; norm << M;
+  vec b= join_cols(U*M, norm);
+  vec g = ones<vec>(M);
+  vec B= join_cols(g,b);
+
+  cout << "print B" << endl;  B.print();
+  vec X = solve(A,B);  //should be replaced by cholevsky
+  vec W =  zeros<vec>(M);
+  for (int m=0; m < M; m++)
+    {
+      if ( X[m] <0 ) cerr << "error: negative weight!" << endl;
+      else W[m]= X[m];
+    }
+   X.print();
+  double delta = 1e-9; 
+  if ( (sum(W) -M) > delta )
+      {
+  	cerr << "Constraint not fulfilled in calculated weights: bad norm" << endl;
+      }
+  vec check =  (u_realizations*W )/M -U;
+for (int i=0; i < N; i++)
+  { 
+    if( check(i)> delta ) 
+       {
+  	cerr << "Constraints not fulfilled in calculated weights: bad average" << endl;
+      }
+    
+  }
+  FILE  *file_weights;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
+  file_weights= fopen(temp, "w");
+  if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
+  for (int m=0; m < M; m++) {
+    fprintf(file_weights, "%d %f \n", m, W(m) );
+  }  
+  
+  return W;
+}
+
 double coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
-  // network->set_seed(1);
   double U_coarse =0;
        for(int j= 0; j < M; j++)
 	 {   
@@ -220,6 +279,29 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
     return   U_coarse /= M;    
 }
 
+vec coarse_stepper(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+{
+  //double U_coarse =0;
+  vec U_coarse = zeros<vec>(network->size());
+       for(int j= 0; j < M; j++)
+	 {   
+	   //vec states_before = zeros<vec>(N); 
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);   //voorlopig laat ik U_guess nog scalair     //=lifting step
+	   //  vec states_before = network->get_states();
+	   vec states_before = conv_to< vec >::from(network->get_states());  // Conversion from std::vector to Armadillo vector  (dimension: N
+	   //	   cout << "sampled states in simple coarse stepper " << endl; 	   states_before.print();
+	   Opinion_formation sim(network); 
+	   sim.run_simulation(time_horizon);	  
+	   vec states = conv_to< vec >::from(network->get_states()); 
+	   U_coarse +=states;   //what with realizations cancelling each other out?
+	 }
+       //states_before.print();
+ 
+    return   U_coarse /= M;    
+}
+
+
+
 double lift_restrict(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   // network->set_seed(1);
@@ -235,8 +317,6 @@ double lift_restrict(double U_guess, double mean_coupling, double var_coupling, 
        
     return   U_coarse /= M;    
 }
-
-
 
 double lift_restrict_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
@@ -267,10 +347,9 @@ double coarse_step_weighted(double U_guess, double mean_coupling, double var_cou
 
        for(int j= 0; j < M; j++)
 	 {   
-	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step
-	   // sampled_states(j)= network->get_node(7)->get_state(); //omdat we eendimensionaal werken  
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);        //=lifting step 
+	   sampled_states(j)= network->get_node(7)->get_state();  //omdat we eendimensionaal werken  
 	   Opinion_formation sim(network); 
-	   sampled_states(j)= network->get_node(7)->get_state();  
 	   sim.run_simulation(time_horizon);
 	   new_states(j)= network->get_node(7)->get_state();
 	 }
@@ -283,8 +362,84 @@ double coarse_step_weighted(double U_guess, double mean_coupling, double var_cou
     
 }
 
+vec coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+{
+  int N= network->size();
+  vec U_coarse = zeros<vec>(N);
+  mat sampled_states = zeros<mat>(N,0);
+  //mat sampled_states =0;
+  mat new_states = zeros<mat>(N,0);
+  
+       for(int j= 0; j < M; j++)
+	 {   
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess(1));        //=lifting step
+	   sampled_states = join_rows ( sampled_states, conv_to< vec >::from(network->get_states()) ) ;  // Conversion from std::vector to Armadillo vector  (dimension: N)
+	   Opinion_formation sim(network); 
+	   sim.run_simulation(time_horizon);	  
+	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ;
+	 }       
+       sampled_states.print();
+       cout << "new states " << endl;
+       new_states.print();
+       //vec w = ones(M);
+       vec w = calculate_weights2(sampled_states, U_guess);
+       return  new_states*w/M;    
+}
 
-rowvec sample_states (double U_guess, int M)
+
+vec coarse_stepper_weighted_cardin(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+{
+  int N= network->size();
+  vec U_coarse = zeros<vec>(N);
+  mat sampled_states = zeros<mat>(N+1,0);
+  //mat sampled_states =0;
+  mat new_states = zeros<mat>(N,0);
+  
+       for(int j= 0; j < M; j++)
+	 {   
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess(1));        //=lifting step
+	   //  vec states_before = network->get_states();
+	   vec card1  = ones<vec>(1);
+	   vec new_realization = join_cols(conv_to< vec >::from(network->get_states()), card1); //N+1
+	 
+	   bool unique_realization= true;
+	   cout << sampled_states.n_cols  << endl;
+	   int col =0;
+	   while (  col < sampled_states.n_cols && unique_realization) //check if this realization already exists
+	     {
+	       cout <<"here" << endl;
+	       int row= 0;
+	       sampled_states.print();
+	       //   cout << sampled_states(0,0) << endl;
+	        cout <<"here" << endl;
+	       while (sampled_states(row,col) == new_realization(row) && row <N)
+		 { row++;}
+	    
+	       if (row>=N-1)       //realization already exists, change cardinality
+		 {   
+		   sampled_states(N,col) = sampled_states(N,col) +1;
+		   unique_realization = false;
+		 }
+	       col++;
+	     } 
+	   if (unique_realization)  { 	        cout <<"unique realization" << endl;   sampled_states = join_rows ( sampled_states, new_realization) ; cout <<"added" << endl;	      }  	 
+	   Opinion_formation sim(network); 
+	   sim.run_simulation(time_horizon);	  
+	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ;
+	 }       
+       cout << "M=  " << M << " realizations" << endl;
+       cout << "M'=  " << sampled_states.n_cols << " unique realizations" << endl;
+       sampled_states.print();
+       cout << "new states " << endl;
+       new_states.print();
+       //vec w = ones(M);
+       vec w = calculate_weights2(sampled_states, U_guess);
+       return  new_states*w/M;    
+}
+
+
+
+rowvec sample_states (double U_guess, int M)   //ter illustratie
 { 
   MTRand mtrand;  
   rowvec sampled_states = zeros<rowvec>(M); 
@@ -307,33 +462,25 @@ rowvec sample_states (double U_guess, int M)
 
 
 
-double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed) 
+double derivative_coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
 {
- // double epsilon = 1e-4;
- // network->set_seed(seed);
- // double Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
- // network->set_seed(seed);
- // double U= coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
- // cout << "difference: U+eps " << Ueps   <<  " U= " << U << endl;
-
   double epsilon = 1e-20;
   double Ueps ;
   double U;
-
   FILE  *file_eps;
   char temp[4096];
   sprintf(temp, "%s%s%s", "data/", "epsilon", ".dat");
   file_eps = fopen(temp, "w");
   if (file_eps == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
   while (epsilon < 0.1)
-      { // double epsilon = 1e-4;
-       	network->set_seed(seed);
-	Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
-	network->set_seed(seed);
+      { 
+	//	network->save_generator_state();
+ 	Ueps = coarse_step(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	//	network->load_generator_state(); //reproduce the same random numbers
 	U= coarse_step(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
 	//	fprintf(file_eps, "%e %e \n", epsilon, abs(Ueps-U) );
 	fprintf(file_eps, "%e %e \n", epsilon, abs(epsilon - Ueps +U) ); //F(U+e)-F(U)
-	cout << "epsilon= " << epsilon << " difference (weighted):|Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	cout << "epsilon= " << epsilon << " difference:|Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
 	epsilon*=10;
       }    
  return (Ueps-U)/epsilon;
@@ -341,9 +488,9 @@ double derivative_coarse_step(double U_guess, double mean_coupling, double var_c
 }
 
 
-double derivative_coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed) 
+double derivative_coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
 {
-  double epsilon = 1e-19;
+  double epsilon = 1e-20;
   double Ueps ;
   double U;
   FILE  *file_eps_w;
@@ -351,11 +498,11 @@ double derivative_coarse_step_weighted(double U_guess, double mean_coupling, dou
   sprintf(temp, "%s%s%s", "data/", "epsilon_weighted", ".dat");
   file_eps_w = fopen(temp, "w");
   if (file_eps_w == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
-  while (epsilon < 1)
-      { // double epsilon = 1e-4;
-       	network->set_seed(seed);
+  while (epsilon < 0.1)
+      { 
+	network->save_generator_state();
 	Ueps = coarse_step_weighted(U_guess+epsilon, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
-	network->set_seed(seed);
+	network->load_generator_state(); 
 	U= coarse_step_weighted(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
 	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
 	fprintf(file_eps_w, "%e %e \n", epsilon, abs( epsilon - Ueps +U) ); //F(U+e)-F(U)
@@ -367,7 +514,7 @@ double derivative_coarse_step_weighted(double U_guess, double mean_coupling, dou
 
 
 
-double newton_raphson(double U_guess, double mean_coupling, double var_coupling,  double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed)
+double newton_raphson(double U_guess, double mean_coupling, double var_coupling,  double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 { 
   double tol=1e-6;
   double err=tol+1;
@@ -377,7 +524,7 @@ double newton_raphson(double U_guess, double mean_coupling, double var_coupling,
   while(  err > tol && it < maxit )
     {
  
-      U_coarse=  U_guess-  ( coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon)  - U_guess)/ (derivative_coarse_step(U_guess, mean_coupling,var_coupling,  mean_preference, var_preference, network, M, time_horizon, seed) -1);  //newton-step  U_n+1 = U_n - f(U_n)/f'(u_n)
+      U_coarse=  U_guess-  ( coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon)  - U_guess)/ (derivative_coarse_step(U_guess, mean_coupling,var_coupling,  mean_preference, var_preference, network, M, time_horizon) -1);  //newton-step  U_n+1 = U_n - f(U_n)/f'(u_n)
       cout << "it = " << it <<  "   u_coarse= " <<  U_coarse << endl;
       err = fabs( U_coarse - U_guess );
       U_guess= U_coarse;
@@ -389,7 +536,7 @@ double newton_raphson(double U_guess, double mean_coupling, double var_coupling,
     cerr << "Error, no convergence in Newton Raphson \n";
 }
 
-double newton_raphson_weighted(double U_guess, double mean_coupling, double var_coupling,  double mean_preference, double var_preference, Network* network, int M, int time_horizon, double seed)
+double newton_raphson_weighted(double U_guess, double mean_coupling, double var_coupling,  double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 { 
   double tol=1e-6;
   double err=tol+1;
@@ -399,7 +546,7 @@ double newton_raphson_weighted(double U_guess, double mean_coupling, double var_
   while(  err > tol && it < maxit )
     {
  
-      U_coarse=  U_guess-  ( coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon)  - U_guess)/ (derivative_coarse_step_weighted(U_guess, mean_coupling,var_coupling,  mean_preference, var_preference, network, M, time_horizon, seed) -1);  //newton-step  U_n+1 = U_n - f(U_n)/f'(u_n)
+      U_coarse=  U_guess-  ( coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon)  - U_guess)/ (derivative_coarse_step_weighted(U_guess, mean_coupling,var_coupling,  mean_preference, var_preference, network, M, time_horizon) -1);  //newton-step  U_n+1 = U_n - f(U_n)/f'(u_n)
       cout << "it = " << it <<  "   u_coarse= " <<  U_coarse << endl;
       err = fabs( U_coarse - U_guess );
       U_guess= U_coarse;
@@ -478,10 +625,6 @@ double fixpoint_iteration(double U_guess, double mean_coupling, double var_coupl
 
 
 
-
-
-
-
 int main(int argc, char* argv[])  {
 
   vector<Network*> net_list;  
@@ -493,7 +636,10 @@ int main(int argc, char* argv[])  {
   bool separate_coarse_states = false;
   MTRand mtrand;
 
-
+  // mat D;
+  // D << 1 << 3 << 5 << endr     << 2 << 4 << 6 << endr;
+  // cout << "check (1,2)=3 : " <<  D[1,2] << endl; //starts counting from 1!
+  //  cout << "check (1,2)=6 : " <<  D(1,2) << endl; //starts counting from 0!
 //   PetscErrorCode ierr; /* used to check for functions returning nonzeros */
 //   Vec x; /* solution vector */
 //   Mat H; /* Hessian matrix */
@@ -588,7 +734,7 @@ int main(int argc, char* argv[])  {
  cout << "Time = " << time_steps << " steps" << endl;
  cout << "M = " << M << endl;
  cout << "Network size = "<< network_size<< " nodes" << endl;
-cout << "RG seed  = "<< rg_seed <<  endl;
+ //cout << "RG seed  = "<< rg_seed <<  endl;
 
 /*!
  * constructing and initializing the networks..
@@ -643,14 +789,17 @@ cout << "RG seed  = "<< rg_seed <<  endl;
        variances= averages2 - square(averages);
 
        // solve for equilibrium state
-       double U_guess=average_state;
+       // double U_guess=average_state;
        // fixpoint_iteration_analytical(U_guess, mean_coupling, mean_preference, var_preference);
        //  newton_raphson_analytical(U_guess, mean_coupling, mean_preference, var_preference);
-
+  
 
        // LIFTING/restriction
-        int time_horizon =5; // 20;
+        int time_horizon =20; // 20;
 	Network*  network =  construct_network(network_type, network_size, degree, p_rewiring);
+	network->set_seed(rg_seed);
+	vec U_guess= zeros<vec>(network_size);
+	U_guess.fill(average_state);
        //   mtrand = network->get_rng();
        //network->setSeed(42);
        // newton_raphson(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, mtrand);  
@@ -666,23 +815,24 @@ cout << "RG seed  = "<< rg_seed <<  endl;
        //       calculate_weights(u_realizations, U+epsilon);
   
        //  newton_raphson_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, mtrand);  
-       network->set_seed(rg_seed);
-       cout << "check identity relation: U: " << lift_restrict(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
-       network->set_seed(rg_seed);
-       cout << "check identity relation using weights" << endl;
-       cout <<   "U: " <<   lift_restrict_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-       network->set_seed(rg_seed);
-       cout << "course step" << endl;
-       network->set_seed(rg_seed);
-       cout << "U =" <<  coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
-       cout << "weighted course step" << endl;
-       network->set_seed(rg_seed);
-       cout <<   "U: " <<   coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-       cout << "checksame random values " << endl;
-       network->set_seed(rg_seed);
-       cout <<   "U: " <<   coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-       cout <<  "derivative" <<   derivative_coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, rg_seed) << endl;  
-       cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, rg_seed) << endl;  
+       // network->set_seed(rg_seed);
+       // cout << "check identity relation: U: " << lift_restrict(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+       // network->set_seed(rg_seed);
+       // cout << "check identity relation using weights" << endl;
+       // cout <<   "U: " <<   lift_restrict_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+       // network->set_seed(rg_seed);
+       // cout << "course step" << endl;
+        network->set_seed(rg_seed);
+	cout << "U =" <<  coarse_stepper(average_state, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+        cout << "weighted course step" << endl;
+        network->set_seed(rg_seed);
+        cout <<   "U: " <<   coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+        cout << "checksame random values " << endl;
+	network->set_seed(rg_seed);
+	cout << "only save unique realization " << endl;
+        cout <<   "U: " <<   coarse_stepper_weighted_cardin(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	//cout <<  "derivative" <<   derivative_coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	//cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
 
 char temp[4096];
        sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_o", ".dat");
