@@ -108,6 +108,8 @@ class Network
         inline vector<Node*> get_nodes() {
             return node_list;
         }
+	
+	inline 
                                  // get a particular node
         Node*                get_node(int node_id);
                                  // get a particular node
@@ -121,6 +123,8 @@ class Network
 
                                  // get states of all nodes
         vector<stateType>    get_node_states();
+
+	
 
         // get edges that loop back to the same node, or result in
         // redundant connections between all nodes A and B.  NB: To use
@@ -139,7 +143,10 @@ class Network
          * Network Modifier Functions
          **************************************************************************/
 	
-	void set_seed(double seed); // the rng can be seeded at any time by calling mtrand->seed(your_seed);  //this line added by pvn
+	void set_seed(double seed); // the rng can be seeded at any time by calling mtrand->seed(your_seed);  //pvn
+	void save_generator_state(); //generator state is saved to array                              //pvn
+	void load_generator_state(); //load the saved generator state (to reproduce earlier drawn random numbers)  //pvn   
+  
         Node* add_new_node();    //creates new node and adds it to the network
         void populate(int n);    //add "n" new nodes to the network
                                  // add an existing node to the network

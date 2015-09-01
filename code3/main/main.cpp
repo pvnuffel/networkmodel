@@ -199,20 +199,28 @@ vec calculate_weights (rowvec u_realizations, double U)
   for (int m=0; m < M; m++) {
     fprintf(file_weights, "%d %f \n", m, W(m) );
   }  
-  
   return W;
 }
 
 vec calculate_weights2 (mat u_realizations, vec U)
 {
-  int M = u_realizations.n_cols;
-  int N= u_realizations.n_rows;
+
+ 
+  int M_red = u_realizations.n_cols;
+  int N= u_realizations.n_rows -1;        //omdat je begint te labelen bij 0 (en omdat later de laatste rij verwijderd wordt)
   // u_realizations.print();
   // cout << "M= "  << M << endl;
-  mat I =  eye<mat>(M,M);
-  mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
+  mat I =  eye<mat>(M_red,M_red);
+  
+  rowvec rowg =  u_realizations.row(N);                        // get the cardinalities (from the last row of u_realizations-matrix)
+  cout << "here0" << endl;
+  vec g = rowg.t();
+  g.print();
+  u_realizations.shed_row( N );                     // remove that row
 
+  mat C =   join_cols(u_realizations, ones<rowvec>(M_red));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
   mat A_l = join_cols(I, C);
+  cout << "here1" << endl;
   mat A_r =  join_cols( C.t(), zeros<mat>(N+1,N+1));
   mat A = join_rows(A_l,A_r);
   cout << "print A" << endl; A.print();
@@ -220,26 +228,28 @@ vec calculate_weights2 (mat u_realizations, vec U)
   // R2.print();
 
 
-  vec norm; norm << M;
-  vec b= join_cols(U*M, norm);
-  vec g = ones<vec>(M);
+  vec norm; norm << M_red;
+  vec b= join_cols(U*M_red, norm);
+
+  //b.print();
   vec B= join_cols(g,b);
 
-  cout << "print B" << endl;  B.print();
+  cout << "print B" << endl;  B.print();  cout << "and now solve the equation!" <<  endl;
   vec X = solve(A,B);  //should be replaced by cholevsky
-  vec W =  zeros<vec>(M);
-  for (int m=0; m < M; m++)
+  vec W =  zeros<vec>(M_red);
+  for (int m=0; m < M_red; m++)
     {
       if ( X[m] <0 ) cerr << "error: negative weight!" << endl;
       else W[m]= X[m];
     }
    X.print();
   double delta = 1e-9; 
-  if ( (sum(W) -M) > delta )
+  if ( (sum(W) -M_red) > delta )
       {
   	cerr << "Constraint not fulfilled in calculated weights: bad norm" << endl;
       }
-  vec check =  (u_realizations*W )/M -U;
+  u_realizations.print();
+  vec check =  (u_realizations*W )/M_red -U;
 for (int i=0; i < N; i++)
   { 
     if( check(i)> delta ) 
@@ -253,10 +263,9 @@ for (int i=0; i < N; i++)
   sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
   file_weights= fopen(temp, "w");
   if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
-  for (int m=0; m < M; m++) {
+  for (int m=0; m < M_red; m++) {
     fprintf(file_weights, "%d %f \n", m, W(m) );
   }  
-  
   return W;
 }
 
@@ -293,7 +302,7 @@ vec coarse_stepper(double U_guess, double mean_coupling, double var_coupling, do
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);	  
 	   vec states = conv_to< vec >::from(network->get_states()); 
-	   U_coarse +=states;   //what with realizations cancelling each other out?
+	   U_coarse +=states;   
 	 }
        //states_before.print();
  
@@ -376,7 +385,7 @@ vec coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupli
 	   sampled_states = join_rows ( sampled_states, conv_to< vec >::from(network->get_states()) ) ;  // Conversion from std::vector to Armadillo vector  (dimension: N)
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);	  
-	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ;
+	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ; //add new realization of N states as a new column
 	 }       
        sampled_states.print();
        cout << "new states " << endl;
@@ -390,50 +399,77 @@ vec coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupli
 vec coarse_stepper_weighted_cardin(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   int N= network->size();
-  vec U_coarse = zeros<vec>(N);
-  mat sampled_states = zeros<mat>(N+1,0);
+  //vec card = zeros<vec>(N);
+  mat sampled_states_red = zeros<mat>(N+1,0);
+  mat sampled_states_orig = zeros<mat>(N,0);
   //mat sampled_states =0;
   mat new_states = zeros<mat>(N,0);
+  // rowvec back_to_orginal_representation = zeros<rowvec>(M);
   
+ 
        for(int j= 0; j < M; j++)
 	 {   
-	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess(1));        //=lifting step
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess(1));        //=lifting step   //voorlopig homogeneous
 	   //  vec states_before = network->get_states();
-	   vec card1  = ones<vec>(1);
+	   sampled_states_orig = join_rows (   sampled_states_orig, conv_to< vec >::from(network->get_states()) ) ;
+	   vec card1  = ones<vec>(1); //vector filled with cardinality= 1 (initially)
 	   vec new_realization = join_cols(conv_to< vec >::from(network->get_states()), card1); //N+1
-	 
 	   bool unique_realization= true;
-	   cout << sampled_states.n_cols  << endl;
+	   // cout << "number of added realizations (= number of columns) =" << sampled_states_red.n_cols  << endl;
+
 	   int col =0;
-	   while (  col < sampled_states.n_cols && unique_realization) //check if this realization already exists
+	   while (  col < sampled_states_red.n_cols && unique_realization) //before adding realization, check whether this realization doesn't already exists (check for identical columns in constraint matrix)
 	     {
-	       cout <<"here" << endl;
 	       int row= 0;
-	       sampled_states.print();
-	       //   cout << sampled_states(0,0) << endl;
-	        cout <<"here" << endl;
-	       while (sampled_states(row,col) == new_realization(row) && row <N)
+	       //    sampled_states_red.print();   cout << endl;
+	       //   cout << sampled_states(0,0) << endl;	      
+	       while (sampled_states_red(row,col) == new_realization(row) && row <N)
 		 { row++;}
 	    
-	       if (row>=N-1)       //realization already exists, change cardinality
+	       if (row>=N-1)       //identical column -> realization already exists -> cardinality++
 		 {   
-		   sampled_states(N,col) = sampled_states(N,col) +1;
+		   sampled_states_red(N,col) = sampled_states_red(N,col) +1;
 		   unique_realization = false;
 		 }
 	       col++;
 	     } 
-	   if (unique_realization)  { 	        cout <<"unique realization" << endl;   sampled_states = join_rows ( sampled_states, new_realization) ; cout <<"added" << endl;	      }  	 
+	   if (unique_realization)  { 	        cout <<"unique realization" << endl;   sampled_states_red = join_rows ( sampled_states_red, new_realization) ; cout <<"added" << endl;	      }  
+	   
+      
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);	  
 	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ;
 	 }       
        cout << "M=  " << M << " realizations" << endl;
-       cout << "M'=  " << sampled_states.n_cols << " unique realizations" << endl;
-       sampled_states.print();
+       cout << "M_red'=  " << sampled_states_red.n_cols << " unique realizations" << endl;
+       cout << "Original sampled states:" << endl;
+       sampled_states_orig.print();
+       cout << "Reduced sampled states:" << endl;
+       sampled_states_red.print();
        cout << "new states " << endl;
        new_states.print();
        //vec w = ones(M);
-       vec w = calculate_weights2(sampled_states, U_guess);
+       vec w_red = calculate_weights2(sampled_states_red, U_guess);
+       vec w =  zeros<vec>(M);
+       
+       int col =0;
+       for (int col =0; col  < sampled_states_orig.n_cols ; col++)       //transform weights back to M-vector: get the weight if the column of the original representation equals the column in the reduced representation 
+	 {
+	   for (int col_red =0; col_red  < sampled_states_red.n_cols ; col_red++)
+	     {
+	       int row= 0;	      
+	       while (sampled_states_orig(row,col) == sampled_states_red(row,col_red) && row < N-1 )
+		 { row++;}
+	    
+	       if (row==N-1) // same realization       
+		 {   
+		   w(col) = w_red(col_red)/ sampled_states_red(N, col_red);
+		 }
+	       
+	     } 
+	 }
+       cout << "w_red=  " << endl; w_red.print() ;
+       cout << "w =  " << endl; w.print();
        return  new_states*w/M;    
 }
 
@@ -512,7 +548,33 @@ double derivative_coarse_step_weighted(double U_guess, double mean_coupling, dou
  return (Ueps-U)/epsilon;
 }
 
+double derivative_coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
+{
+  double epsilon=1e-20;
+  vec U= zeros<vec>(U_guess.n_elem);
+  vec Ueps= zeros<vec>(U_guess.n_elem); 
+  vec epsilons= zeros<vec>(U_guess.n_elem);
+  FILE  *file_eps_ws;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "epsilon_weighted_cardin", ".dat");
+  file_eps_ws = fopen(temp, "w");
+  if (file_eps_ws == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
+  while (epsilon < 0.1)
+      { 
+	epsilons.fill(epsilon);
+	network->save_generator_state();
+	Ueps = coarse_stepper_weighted_cardin(U_guess+epsilons, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	network->load_generator_state(); 
+	U= coarse_stepper_weighted_cardin(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
+	fprintf(file_eps_ws, "%e %e \n", epsilon, norm( epsilon - Ueps +U,2) ) ; //F(U+e)-F(U)
+	cout << "epsilon= " << epsilon << " 2-norm of difference (weighted): |Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	epsilon*=10;
+      }
+ return  norm( epsilon - Ueps +U,2);
+}
 
+ 
 
 double newton_raphson(double U_guess, double mean_coupling, double var_coupling,  double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 { 
@@ -815,24 +877,25 @@ int main(int argc, char* argv[])  {
        //       calculate_weights(u_realizations, U+epsilon);
   
        //  newton_raphson_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon, mtrand);  
-       // network->set_seed(rg_seed);
-       // cout << "check identity relation: U: " << lift_restrict(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
-       // network->set_seed(rg_seed);
-       // cout << "check identity relation using weights" << endl;
-       // cout <<   "U: " <<   lift_restrict_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-       // network->set_seed(rg_seed);
-       // cout << "course step" << endl;
-        network->set_seed(rg_seed);
-	cout << "U =" <<  coarse_stepper(average_state, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
-        cout << "weighted course step" << endl;
-        network->set_seed(rg_seed);
-        cout <<   "U: " <<   coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-        cout << "checksame random values " << endl;
-	network->set_seed(rg_seed);
-	cout << "only save unique realization " << endl;
-        cout <<   "U: " <<   coarse_stepper_weighted_cardin(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-	//cout <<  "derivative" <<   derivative_coarse_step(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-	//cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+        // network->set_seed(rg_seed);
+        // cout << "check identity relation: U: " << lift_restrict(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+        // network->set_seed(rg_seed);
+        // cout << "check identity relation using weights" << endl;
+        // cout <<   "U: " <<   lift_restrict_weighted(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+        // network->set_seed(rg_seed);
+        // cout << "course step" << endl;
+        // network->set_seed(rg_seed);
+	// cout << "U =" <<  coarse_stepper(average_state, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
+	//  cout << "weighted course step" << endl;
+        //network->set_seed(rg_seed);
+	//    cout <<   "U: " <<   coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	// cout << "checksame random values " << endl;
+	//	network->set_seed(rg_seed);
+	//	cout << "only save unique realization " << endl;
+	//        cout <<   "U: " <<   coarse_stepper_weighted_cardin(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	cout <<  "derivative" <<   derivative_coarse_step(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	cout <<  "derivative cardin weighted " <<   derivative_coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl; 
 
 char temp[4096];
        sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_o", ".dat");

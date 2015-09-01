@@ -97,6 +97,33 @@ void Network::set_seed (double seed)
   mtrand.seed(seed);
 }
 
+void Network::save_generator_state()
+{
+  //MTRand::uint32 randState[ MTRand::SAVE ];
+  //mtrand.save( randState );
+  
+  ofstream stateOut( "state.data" );
+  if( stateOut )
+    {
+      stateOut << mtrand;
+      stateOut.close();
+    }
+  //network->set_seed(seed);
+
+}
+
+void Network::load_generator_state()
+{
+  //MTRand::uint32 randState[ MTRand::SAVE ];
+  //mtrand.save( randState );
+  ifstream stateIn( "state.data" );
+  if( stateIn )
+   {
+     stateIn >> mtrand;
+     stateIn.close();
+   } 
+}
+
 void Network::populate( int n ) {
     for (int i = 0; i < n; i++) {
         add_new_node();
