@@ -50,7 +50,8 @@ pl.yscale('log')
 pl.xscale('log')
 
 pl.xlabel(r'$\epsilon $', fontsize=15)
-pl.ylabel(r'$\epsilon -\phi_T(U +\epsilon) + \phi_T(U) $', fontsize=15)
+#pl.ylabel(r'$\epsilon -\phi_T(U +\epsilon) + \phi_T(U) $', fontsize=15)      #for 1-particle statistics
+pl.ylabel(r'$||\epsilon -\phi_T(U +\epsilon) + \phi_T(U) ||$', fontsize=15)
 #ax1.set_xlim(-4, 4)
 #ax1.set_ylim(0, 1)
 #plt.savefig(plotname, dpi=100) 

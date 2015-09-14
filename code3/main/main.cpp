@@ -164,7 +164,6 @@ vec calculate_weights (rowvec u_realizations, double U)
   // cout << "M= "  << M << endl;
   mat I =  eye<mat>(M,M);
   mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
-  mat D;
   //D << 1 << 3 << 5 << endr     << 2 << 4 << 6 << endr;
   // cout << "check (1,2)=3 : " <<  D[1,2] << endl;
   //cout << "sampled check (1,2): " <<  C[1,2] << endl;
@@ -187,25 +186,94 @@ vec calculate_weights (rowvec u_realizations, double U)
     }
   //  X.print();
   double delta = 1e-9; 
-  if ( (sum(W) -M > delta)  || (  ( dot(u_realizations,W )/M -U) > delta ) )
+  if ( abs(sum(W) -M) > delta  || (  ( dot(u_realizations,W )/M -U) > delta ) )
       {
   	cerr << "Constraints not fulfilled in calculated weights!" << endl;
       }
-  FILE  *file_weights;
-  char temp[4096];
-  sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
-  file_weights= fopen(temp, "w");
-  if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
-  for (int m=0; m < M; m++) {
-    fprintf(file_weights, "%d %f \n", m, W(m) );
-  }  
+  // FILE  *file_weights;
+  // char temp[4096];
+  // sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
+  // file_weights= fopen(temp, "w");
+  // if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
+  // for (int m=0; m < M; m++) {
+  //   fprintf(file_weights, "%d %f \n", m, W(m) );
+  // }  
   return W;
 }
 
-vec calculate_weights2 (mat u_realizations, vec U)
-{
 
- 
+
+
+
+
+vec calculate_weights3 (mat u_realizations, vec U)    //using original representation 
+{
+  int M = u_realizations.n_cols;
+  int N= u_realizations.n_rows;        //omdat je begint te labelen bij 0 (en omdat later de laatste rij verwijderd wordt)
+  // cout << "M= "  << M << endl;
+  mat I =  eye<mat>(M,M);
+  //g.print();
+  mat C =   join_cols(u_realizations, ones<rowvec>(M));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
+ cout << "here oiginal w3a" << endl;
+  mat A_l = join_cols(I, C);
+ cout << "here oiginal w3b" << endl;
+  mat A_r =  join_cols( C.t(), zeros<mat>(N+1,N+1));
+  mat A = join_rows(A_l,A_r);
+  if(M<12) {  cout << "print A" << endl; A.print();}
+  // mat R2 = chol(A);  failed to converge
+  // R2.print();
+  cout << "here oiginal w3" << endl;
+  vec norm; norm << M;
+  vec b= join_cols(U*M, norm);
+  vec g = ones<vec>(M);
+  //b.print();
+  vec B= join_cols(g,b);
+  if(M<12) {    cout << "print B" << endl;  B.print();  cout << "And now solve the equation Ax=b for x!" <<  endl;}
+  vec X = solve(A,B);  //should be replaced by cholevsky
+  vec W =  zeros<vec>(M);
+   if(M < 12) X.print();
+  for (int m=0; m < M; m++)
+    {
+      if ( X[m] <0 ) {cerr << "error: negative weight!" << endl << "Try to use more MC-steps (M>60, N>10)" << endl;;    return 0;     }
+      else W[m]= X[m];
+    }
+   if(M < 12) X.print();
+  double delta = 1e-9; 
+  if ( abs(sum(W) -M) > delta )
+      {
+  	cerr << "Constraint not fulfilled in calculated weights: bad norm" << endl;
+	return 0;  
+      }
+  if(M < 12) {u_realizations.print();}
+  vec check =  abs((u_realizations*W )/M -U);
+for (int i=0; i < N; i++)
+  { 
+    if( check(i)> delta ) 
+       {
+  	cerr << "Constraints not fulfilled in calculated weights: bad average" << endl;
+	return 0;  
+      }
+    
+  }
+  // FILE  *file_weights;
+  // char temp[4096];
+  // sprintf(temp, "%s%s%s", "data/", "weights", ".dat");
+  // file_weights= fopen(temp, "w");
+  // if (file_weights == 0) { cerr << "Error: can't open weights file \n" << endl; }
+  // for (int m=0; m < M; m++) {
+  //   fprintf(file_weights, "%d %f \n", m, W(m) );
+  // }  
+  return W;
+}
+
+
+
+
+
+
+
+vec calculate_weights2 (mat u_realizations, vec U)    //using cadinality representation 
+{
   int M_red = u_realizations.n_cols;
   int N= u_realizations.n_rows -1;        //omdat je begint te labelen bij 0 (en omdat later de laatste rij verwijderd wordt)
   // u_realizations.print();
@@ -213,19 +281,20 @@ vec calculate_weights2 (mat u_realizations, vec U)
   mat I =  eye<mat>(M_red,M_red);
   
   rowvec rowg =  u_realizations.row(N);                        // get the cardinalities (from the last row of u_realizations-matrix)
-  cout << "here0" << endl;
   vec g = rowg.t();
-  g.print();
+  //g.print();
   u_realizations.shed_row( N );                     // remove that row
 
   mat C =   join_cols(u_realizations, ones<rowvec>(M_red));                          //u_coarse_states.insert_rows(1,ones(M) ) ;
   mat A_l = join_cols(I, C);
-  cout << "here1" << endl;
   mat A_r =  join_cols( C.t(), zeros<mat>(N+1,N+1));
   mat A = join_rows(A_l,A_r);
-  cout << "print A" << endl; A.print();
+  if(M_red<12) {  cout << "print A" << endl; A.print();}
   // mat R2 = chol(A);  failed to converge
   // R2.print();
+
+
+  cout << "HERE 0 "  << endl;
 
 
   vec norm; norm << M_red;
@@ -233,28 +302,52 @@ vec calculate_weights2 (mat u_realizations, vec U)
 
   //b.print();
   vec B= join_cols(g,b);
+  if(M_red<12) {    cout << "print B" << endl;  B.print();  cout << "And now solve the equation Ax=b for x!" <<  endl;}
 
-  cout << "print B" << endl;  B.print();  cout << "and now solve the equation!" <<  endl;
-  vec X = solve(A,B);  //should be replaced by cholevsky
+
+  //mat X1 = randu<mat>(3,3);
+  // X1.print();
+  // cout << "HERE 1 "  << endl;
+  // mat Y1 = X1.t()*X1;
+  // Y1.print();
+  // mat R0 = chol(Y1);
+  // R0.print();
+
+  mat Lower, Upper, P;
+  lu(Lower, Upper, A);
+  vec y = solve(trimatl(Lower),B);
+  vec X = solve(trimatu(Upper),y);
+
+  //t  R1= chol(A); //does not converge : A not postive definit?
+  // mat R1;
+  // chol(R1, A);
+  // vec y = solve(R1,B);
+  // vec X = solve(R1.t(), y);
+  //vec X = solve(A,B);  //should be replaced by cholesky
+
+  cout << "HERE 2 "  << endl;
   vec W =  zeros<vec>(M_red);
+   if(M_red < 12) X.print();
   for (int m=0; m < M_red; m++)
     {
-      if ( X[m] <0 ) cerr << "error: negative weight!" << endl;
+      if ( X[m] <0 ) {cerr << "error: negative weight!" << endl << "Try to use more MC-steps (M>60, N>10)" << endl;;    return 0;     }
       else W[m]= X[m];
     }
-   X.print();
+   if(M_red < 12) X.print();
   double delta = 1e-9; 
-  if ( (sum(W) -M_red) > delta )
+  if ( abs(sum(W) -M_red) > delta )
       {
   	cerr << "Constraint not fulfilled in calculated weights: bad norm" << endl;
+	return 0;  
       }
-  u_realizations.print();
-  vec check =  (u_realizations*W )/M_red -U;
+  if (M_red <12) u_realizations.print();
+  vec check =  abs((u_realizations*W )/M_red -U);
 for (int i=0; i < N; i++)
   { 
     if( check(i)> delta ) 
        {
   	cerr << "Constraints not fulfilled in calculated weights: bad average" << endl;
+	return 0;  
       }
     
   }
@@ -268,6 +361,7 @@ for (int i=0; i < N; i++)
   }  
   return W;
 }
+
 
 double coarse_step(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
@@ -288,14 +382,14 @@ double coarse_step(double U_guess, double mean_coupling, double var_coupling, do
     return   U_coarse /= M;    
 }
 
-vec coarse_stepper(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
+vec coarse_stepper(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
 {
   //double U_coarse =0;
   vec U_coarse = zeros<vec>(network->size());
        for(int j= 0; j < M; j++)
 	 {   
 	   //vec states_before = zeros<vec>(N); 
-	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess);   //voorlopig laat ik U_guess nog scalair     //=lifting step
+	   network->lift(mean_coupling,var_coupling, mean_preference, var_preference, U_guess(1));   //voorlopig laat ik U_guess nog scalair     //=lifting step
 	   //  vec states_before = network->get_states();
 	   vec states_before = conv_to< vec >::from(network->get_states());  // Conversion from std::vector to Armadillo vector  (dimension: N
 	   //	   cout << "sampled states in simple coarse stepper " << endl; 	   states_before.print();
@@ -305,7 +399,6 @@ vec coarse_stepper(double U_guess, double mean_coupling, double var_coupling, do
 	   U_coarse +=states;   
 	 }
        //states_before.print();
- 
     return   U_coarse /= M;    
 }
 
@@ -376,7 +469,6 @@ vec coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupli
   int N= network->size();
   vec U_coarse = zeros<vec>(N);
   mat sampled_states = zeros<mat>(N,0);
-  //mat sampled_states =0;
   mat new_states = zeros<mat>(N,0);
   
        for(int j= 0; j < M; j++)
@@ -387,13 +479,14 @@ vec coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupli
 	   sim.run_simulation(time_horizon);	  
 	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ; //add new realization of N states as a new column
 	 }       
-       sampled_states.print();
+       if (M<12) sampled_states.print();
        cout << "new states " << endl;
-       new_states.print();
+       if (M<12)  new_states.print();
        //vec w = ones(M);
-       vec w = calculate_weights2(sampled_states, U_guess);
+       vec w = calculate_weights3(sampled_states, U_guess);
        return  new_states*w/M;    
 }
+
 
 
 vec coarse_stepper_weighted_cardin(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)
@@ -433,22 +526,61 @@ vec coarse_stepper_weighted_cardin(vec U_guess, double mean_coupling, double var
 		 }
 	       col++;
 	     } 
-	   if (unique_realization)  { 	        cout <<"unique realization" << endl;   sampled_states_red = join_rows ( sampled_states_red, new_realization) ; cout <<"added" << endl;	      }  
-	   
-      
+	   if (unique_realization)
+	     { 	       
+	       // cout <<"unique realization" << endl;   
+	       sampled_states_red = join_rows ( sampled_states_red, new_realization) ; 
+	       //cout <<"added" << endl;	   
+	     }  
 	   Opinion_formation sim(network); 
 	   sim.run_simulation(time_horizon);	  
 	   new_states = join_rows (new_states, conv_to< vec >::from(network->get_states()) ) ;
-	 }       
+	 }     
+
        cout << "M=  " << M << " realizations" << endl;
-       cout << "M_red'=  " << sampled_states_red.n_cols << " unique realizations" << endl;
-       cout << "Original sampled states:" << endl;
-       sampled_states_orig.print();
-       cout << "Reduced sampled states:" << endl;
-       sampled_states_red.print();
-       cout << "new states " << endl;
-       new_states.print();
-       //vec w = ones(M);
+       int M_red = sampled_states_red.n_cols;
+       cout << "M_red=  " << M_red << " unique realizations" << endl;
+  
+       if(M_red < 12) {        
+	 cout << "Original sampled states:" << endl;
+	 sampled_states_orig.print();
+	 cout << "Reduced sampled states:" << endl;
+	 sampled_states_red.print();}
+
+       for (int row =0 ;  row < N ;  row++)     //search for rows with all elements 0 or all elements 1 in the constraint matrix
+	 {
+	   int col = 0;
+	   while( col < M_red && sampled_states_red(row, col) == 0)     //check for row of 0's
+	     { col++;}
+	   if (col == M_red) 
+	     {
+	       vec artificial_realization = zeros<vec>(N+1);
+	       artificial_realization(row)= 1;
+	       sampled_states_red = join_rows ( sampled_states_red, artificial_realization) ; 
+	       cout << "artificial realization created. New constraint matrix = " <<  endl;
+	       if(M_red < 12) {sampled_states_red.print();}
+	     }
+	   col = 0;
+	   while( col < M_red && sampled_states_red(row, col) == 1 )     //check for row of 0's
+	     { col++;}
+	   if (col == M_red) 
+	     {
+	       vec artificial_realization = ones<vec>(N+1);
+	       artificial_realization(row)= 0;
+	       artificial_realization.print();
+	       sampled_states_red = join_rows ( sampled_states_red, artificial_realization) ; 
+	       cout << "artificial realization created. New constraint matrix = " <<  endl;
+	       if(M_red < 12) {sampled_states_red.print();}
+	     }
+	 } 
+
+       //TO DO:   //search for duplicate rows in the constraint matrix
+  
+       if(M<12)
+	 {
+	   cout << "new states " << endl;
+	   new_states.print();
+	 }
        vec w_red = calculate_weights2(sampled_states_red, U_guess);
        vec w =  zeros<vec>(M);
        
@@ -505,7 +637,7 @@ double derivative_coarse_step(double U_guess, double mean_coupling, double var_c
   double U;
   FILE  *file_eps;
   char temp[4096];
-  sprintf(temp, "%s%s%s", "data/", "epsilon", ".dat");
+  sprintf(temp, "%s%s%s", "data/", "epsilon_node7", ".dat");
   file_eps = fopen(temp, "w");
   if (file_eps == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
   while (epsilon < 0.1)
@@ -523,6 +655,35 @@ double derivative_coarse_step(double U_guess, double mean_coupling, double var_c
  
 }
 
+double derivative_coarse_stepper(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
+{
+  double epsilon=1e-20;
+  vec U= zeros<vec>(U_guess.n_elem);
+  vec Ueps= zeros<vec>(U_guess.n_elem); 
+  vec epsilons= zeros<vec>(U_guess.n_elem);
+  vec random_unit_vector;
+  FILE  *file_eps_s;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "epsilon", ".dat");
+  file_eps_s = fopen(temp, "w");
+  if (file_eps_s == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
+  while (epsilon < 0.1)
+      { 
+	epsilons.fill(epsilon);
+	//network->save_generator_state();
+	Ueps = coarse_stepper(U_guess+epsilons, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	//network->load_generator_state(); 
+	U= coarse_stepper(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
+	fprintf(file_eps_s, "%e %e \n", epsilon, norm( epsilon - Ueps +U,2) ) ; //norm(F(U+e)-F(U))
+	cout << "epsilon= " << epsilon << " 2-norm of difference (weighted): |Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	epsilon*=10;
+      }
+ return  norm( epsilon - Ueps +U,2);
+}
+
+ 
+
 
 double derivative_coarse_step_weighted(double U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
 {
@@ -531,7 +692,7 @@ double derivative_coarse_step_weighted(double U_guess, double mean_coupling, dou
   double U;
   FILE  *file_eps_w;
   char temp[4096];
-  sprintf(temp, "%s%s%s", "data/", "epsilon_weighted", ".dat");
+  sprintf(temp, "%s%s%s", "data/", "epsilon_weighted_node7", ".dat");
   file_eps_w = fopen(temp, "w");
   if (file_eps_w == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
   while (epsilon < 0.1)
@@ -548,12 +709,18 @@ double derivative_coarse_step_weighted(double U_guess, double mean_coupling, dou
  return (Ueps-U)/epsilon;
 }
 
+
+
+
+
 double derivative_coarse_stepper_weighted(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon) 
 {
   double epsilon=1e-20;
   vec U= zeros<vec>(U_guess.n_elem);
   vec Ueps= zeros<vec>(U_guess.n_elem); 
   vec epsilons= zeros<vec>(U_guess.n_elem);
+  vec random_vector =  randn<vec>(U_guess.n_elem); // this does the same as mtrand.randNorm(0, 1); (To create a unit-norm random vector, rely on the fact that a gaussian distribution is spherically symmetric and also separable. Build a vector V where each element is a Gaussian distributed value of mean 0, choose any width that makes sense. Then Normalize the vector V. This vector now is a random unit vector uniformly distributed across the hypersphere of the vector V. This algorithm is both fast and is linear in the dimension of V.)
+  vec random_unit_vector =  random_vector/norm(random_vector,2);  //  cout << "check norm unit vector = " <<  dot(random_unit_vector.t(), random_unit_vector) << endl;
   FILE  *file_eps_ws;
   char temp[4096];
   sprintf(temp, "%s%s%s", "data/", "epsilon_weighted_cardin", ".dat");
@@ -562,10 +729,41 @@ double derivative_coarse_stepper_weighted(vec U_guess, double mean_coupling, dou
   while (epsilon < 0.1)
       { 
 	epsilons.fill(epsilon);
+	//	epsilons = random_unit_vector*epsilon;
 	network->save_generator_state();
 	Ueps = coarse_stepper_weighted_cardin(U_guess+epsilons, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
 	network->load_generator_state(); 
 	U= coarse_stepper_weighted_cardin(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
+	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
+	fprintf(file_eps_ws, "%e %e \n", epsilon, norm( epsilon - Ueps +U,2) ) ; //F(U+e)-F(U)
+	cout << "epsilon= " << epsilon << " 2-norm of difference (weighted): |Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
+	epsilon*=10;
+      }
+ return  norm( epsilon - Ueps +U,2);
+}
+
+
+double derivative_coarse_stepper_weighted2(vec U_guess, double mean_coupling, double var_coupling, double mean_preference, double var_preference, Network* network, int M, int time_horizon)  //without cardin
+{
+  double epsilon=1e-2;
+  vec U= zeros<vec>(U_guess.n_elem);
+  vec Ueps= zeros<vec>(U_guess.n_elem); 
+  vec epsilons= zeros<vec>(U_guess.n_elem);
+  vec random_vector =  randn<vec>(U_guess.n_elem); // this does the same as mtrand.randNorm(0, 1); (To create a unit-norm random vector, rely on the fact that a gaussian distribution is spherically symmetric and also separable. Build a vector V where each element is a Gaussian distributed value of mean 0, choose any width that makes sense. Then Normalize the vector V. This vector now is a random unit vector uniformly distributed across the hypersphere of the vector V. This algorithm is both fast and is linear in the dimension of V.)
+  vec random_unit_vector =  random_vector/norm(random_vector,2);  //  cout << "check norm unit vector = " <<  dot(random_unit_vector.t(), random_unit_vector) << endl;
+  FILE  *file_eps_ws;
+  char temp[4096];
+  sprintf(temp, "%s%s%s", "data/", "epsilon_weighted_cardin", ".dat");
+  file_eps_ws = fopen(temp, "w");
+  if (file_eps_ws == 0) { cerr << "Error: can't open epsilon file \n" << endl; }
+  while (epsilon < 0.1)
+      { 
+	epsilons.fill(epsilon);
+	//	epsilons = random_unit_vector*epsilon;
+	network->save_generator_state();
+	Ueps = coarse_stepper_weighted(U_guess+epsilons, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon);
+	network->load_generator_state(); 
+	U= coarse_stepper_weighted(U_guess, mean_coupling,var_coupling, mean_preference, var_preference, network, M, time_horizon ) ;
 	//	fprintf(file_eps_w, "%e %e \n", epsilon, abs(Ueps-U) );
 	fprintf(file_eps_ws, "%e %e \n", epsilon, norm( epsilon - Ueps +U,2) ) ; //F(U+e)-F(U)
 	cout << "epsilon= " << epsilon << " 2-norm of difference (weighted): |Ueps-U| = " << abs(Ueps  - U) << endl ; //  " U= " << U << endl;
@@ -888,14 +1086,15 @@ int main(int argc, char* argv[])  {
 	// cout << "U =" <<  coarse_stepper(average_state, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;
 	//  cout << "weighted course step" << endl;
         //network->set_seed(rg_seed);
-	//    cout <<   "U: " <<   coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	//	   cout <<   "U: " <<   coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
 	// cout << "checksame random values " << endl;
 	//	network->set_seed(rg_seed);
 	//	cout << "only save unique realization " << endl;
-	//        cout <<   "U: " <<   coarse_stepper_weighted_cardin(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-	cout <<  "derivative" <<   derivative_coarse_step(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-	cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
-	cout <<  "derivative cardin weighted " <<   derivative_coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl; 
+	cout <<   "U: " <<   coarse_stepper_weighted_cardin(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	   //	cout <<  "Derivative without weights:  (Ueps-U)/epsilon =   " <<   derivative_coarse_stepper(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl << endl << endl;  
+	//	cout <<  "derivative weighted " <<   derivative_coarse_step_weighted(U_guess(1), mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl; 
+	//	cout <<  "Derivative no-cardin weighted: " <<   derivative_coarse_stepper_weighted2(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl;  
+	   //	cout <<  "Derivative cardin weighted: " <<   derivative_coarse_stepper_weighted(U_guess, mean_coupling, var_coupling, mean_preference, var_preference, network, M, time_horizon) << endl; 
 
 char temp[4096];
        sprintf(temp, "%s%s%s%s", "data/", output_name.c_str(),"_o", ".dat");
