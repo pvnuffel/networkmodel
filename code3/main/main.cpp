@@ -294,8 +294,6 @@ vec calculate_weights2 (mat u_realizations, vec U)    //using cadinality represe
   // R2.print();
 
 
-  cout << "HERE 0 "  << endl;
-
 
   vec norm; norm << M_red;
   vec b= join_cols(U*M_red, norm);
@@ -325,7 +323,7 @@ vec calculate_weights2 (mat u_realizations, vec U)    //using cadinality represe
   // vec X = solve(R1.t(), y);
   //vec X = solve(A,B);  //should be replaced by cholesky
 
-  cout << "HERE 2 "  << endl;
+  //cout << "HERE 2 "  << endl;
   vec W =  zeros<vec>(M_red);
    if(M_red < 12) X.print();
   for (int m=0; m < M_red; m++)
